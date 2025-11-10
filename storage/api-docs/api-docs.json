@@ -38,7 +38,7 @@
                             }
                         }
                     },
-                    "404": {
+                    "404": { 
                         "description": "Aucun compte trouvé",
                         "content": {
                             "application/json": {
