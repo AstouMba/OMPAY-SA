@@ -9,11 +9,11 @@ COPY composer.json composer.lock ./
 # Installer les dépendances PHP (sans dev ni scripts post-install)
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
-# Étape 2: Image finale PHP-FPM Alpine
+# Étape 2: Image finale PHP-FPM Alpine pour production
 FROM php:8.3-fpm-alpine
 
 # Installer les extensions PHP nécessaires pour PostgreSQL
-RUN apk add --no-cache postgresql-dev bash git unzip \
+RUN apk add --no-cache postgresql-dev bash git unzip curl \
     && docker-php-ext-install pdo pdo_pgsql
 
 # Créer un utilisateur non-root
@@ -44,6 +44,10 @@ USER laravel
 
 # Exposer le port 8000 (artisan serve)
 EXPOSE 8000
+
+# Health check pour les orchestrateurs
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/api/v1/health || exit 1
 
 # Commande par défaut pour le container
 CMD ["docker-entrypoint.sh"]

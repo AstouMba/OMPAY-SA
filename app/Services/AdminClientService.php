@@ -20,21 +20,10 @@ class AdminClientService
         $this->compteRepository = $compteRepository;
     }
 
-    public function validateData(array $data)
-    {
-        $validator = Validator::make($data, [
-            'nom' => 'required|string|max:255',
-            'prenom' => 'required|string|max:255',
-            'telephone' => ['required', new TelephoneSenegalRule()],
-            'nci' => ['required', 'unique:clients,nci', new NciRule()],
-        ]);
-
-        return $validator;
-    }
+    // La validation est maintenant gérée par CreateClientRequest
 
     public function createClientAndAccount(array $data)
     {
-        // Vérifier si le numéro de compte existe déjà
         $existingCompte = $this->compteRepository->findByNumero($data['telephone']);
         if ($existingCompte) {
             throw new \Exception('Le numéro de compte existe déjà.');

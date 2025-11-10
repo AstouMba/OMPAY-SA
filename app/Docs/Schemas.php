@@ -112,5 +112,63 @@ use OpenApi\Annotations as OA;
  *         @OA\Property(property="compte", ref="#/components/schemas/Compte")
  *     )
  * )
+ *
+ * @OA\Schema(
+ *     schema="User",
+ *     type="object",
+ *     title="Utilisateur Administrateur",
+ *     description="Modèle représentant un utilisateur administrateur",
+ *     @OA\Property(property="id", type="integer", description="ID unique de l'utilisateur"),
+ *     @OA\Property(property="name", type="string", description="Nom de l'utilisateur"),
+ *     @OA\Property(property="email", type="string", format="email", description="Email de l'utilisateur"),
+ *     @OA\Property(property="role", type="string", enum={"admin", "user"}, description="Rôle de l'utilisateur"),
+ *     @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true, description="Date de vérification email"),
+ *     @OA\Property(property="created_at", type="string", format="date-time", description="Date de création"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", description="Date de mise à jour")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="LoginRequest",
+ *     type="object",
+ *     title="Requête de connexion",
+ *     description="Données pour l'authentification",
+ *     required={"email", "password"},
+ *     @OA\Property(property="email", type="string", format="email", description="Email de l'utilisateur"),
+ *     @OA\Property(property="password", type="string", format="password", description="Mot de passe")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="OtpRequest",
+ *     type="object",
+ *     title="Requête d'envoi OTP",
+ *     description="Données pour l'envoi d'un code OTP",
+ *     required={"telephone"},
+ *     @OA\Property(property="telephone", type="string", description="Numéro de téléphone sénégalais (format: +221XXXXXXXXX)")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="VerifyOtpRequest",
+ *     type="object",
+ *     title="Requête de vérification OTP",
+ *     description="Données pour vérifier le code OTP",
+ *     required={"telephone", "otp"},
+ *     @OA\Property(property="telephone", type="string", description="Numéro de téléphone sénégalais"),
+ *     @OA\Property(property="otp", type="string", minLength=6, maxLength=6, description="Code OTP à 6 chiffres")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="AuthResponse",
+ *     type="object",
+ *     title="Réponse d'authentification",
+ *     description="Réponse après authentification réussie",
+ *     @OA\Property(property="success", type="boolean", example=true, description="Statut de succès"),
+ *     @OA\Property(property="message", type="string", description="Message de succès"),
+ *     @OA\Property(property="data", type="object",
+ *         @OA\Property(property="user", ref="#/components/schemas/User", description="Informations utilisateur (admin)"),
+ *         @OA\Property(property="client", ref="#/components/schemas/Client", description="Informations client"),
+ *         @OA\Property(property="access_token", type="string", description="Token d'accès JWT"),
+ *         @OA\Property(property="token_type", type="string", example="Bearer", description="Type de token")
+ *     )
+ * )
  */
 class Schemas {}

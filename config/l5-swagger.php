@@ -13,6 +13,8 @@ return [
                  * Route for accessing api documentation interface
                  */
                 'api' => 'api/documentation',
+                'docs' => 'docs',              
+
             ],
             'paths' => [
                 /*
@@ -248,7 +250,7 @@ return [
          * Edit to trust the proxy's ip address - needed for AWS Load Balancer
          * string[]
          */
-        'proxy' => false,
+        'proxy' => null,
 
         /*
          * Configs plugin allows to fetch external configs instead of passing them to SwaggerUIBundle.

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\AdminClientService;
 use App\Traits\ApiResponses;
 use App\Enums\MessageEnumFr;
-use Illuminate\Http\Request;
+use App\Http\Requests\CreateClientRequest;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminClientController extends Controller
@@ -19,16 +19,10 @@ class AdminClientController extends Controller
         $this->adminClientService = $adminClientService;
     }
 
-    public function create(Request $request)
+    public function create(CreateClientRequest $request)
     {
-        $validator = $this->adminClientService->validateData($request->all());
-
-        if ($validator->fails()) {
-            return $this->errorResponse($validator->errors()->first(), Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
         try {
-            $result = $this->adminClientService->createClientAndAccount($request->all());
+            $result = $this->adminClientService->createClientAndAccount($request->validated());
 
             return $this->successResponse([
                 'client' => $result['client'],
