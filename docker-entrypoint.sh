@@ -1,12 +1,34 @@
 #!/bin/sh
 
+# Attendre que la base de données soit prête (optionnel)
+if [ -n "$DB_HOST" ]; then
+    echo "Waiting for database connection..."
+    while ! pg_isready -h $DB_HOST -p $DB_PORT -U $DB_USERNAME; do
+        sleep 1
+    done
+    echo "Database is ready!"
+fi
+
 # Générer la clé d'application si non existante
 php artisan key:generate --force
 
-# Optimiser config, routes et vues
+# Exécuter les migrations si demandé
+if [ "$RUN_MIGRATIONS" = "true" ]; then
+    echo "Running database migrations..."
+    php artisan migrate --force
+fi
+
+# Exécuter les seeders si demandé
+if [ "$RUN_SEEDERS" = "true" ]; then
+    echo "Running database seeders..."
+    php artisan db:seed --force
+fi
+
+# Optimiser config, routes et vues pour la production
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
 # Lancer le serveur Laravel
-php artisan serve --host=0.0.0.0 --port=8000
+echo "Starting Laravel server on port ${PORT:-8000}..."
+php artisan serve --host=0.0.0.0 --port=${PORT:-8000}

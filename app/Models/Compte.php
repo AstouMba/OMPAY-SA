@@ -45,15 +45,19 @@ class Compte extends Model
 
     public function solde()
     {
-        $depots = $this->transactions()->depot()->validees()->sum('montant');
-        $transfertsEntrants = $this->transactions()->transfertEntrant()->validees()->sum('montant');
-        $paiementsRecus = $this->transactions()->paiementRecu()->validees()->sum('montant'); // Assuming depot and transfert_credit are positive
+        // Calcul des entrées (crédits)
+        $entrees = $this->transactions()
+            ->whereIn('type', ['depot', 'transfert_credit'])
+            ->where('statut', 'validee')
+            ->sum('montant');
 
-        $retraits = $this->transactions()->retrait()->validees()->sum('montant');
-        $transfertsSortants = $this->transactions()->transfertSortant()->validees()->sum('montant');
-        $paiementsEnvoyes = $this->transactions()->where('type', 'paiement_marchand')->validees()->sum('montant');
+        // Calcul des sorties (débits)
+        $sorties = $this->transactions()
+            ->whereIn('type', ['retrait', 'transfert_debit', 'paiement_marchand'])
+            ->where('statut', 'validee')
+            ->sum('montant');
 
-        return ($depots + $transfertsEntrants + $paiementsRecus) - ($retraits + $transfertsSortants + $paiementsEnvoyes);
+        return $entrees - $sorties;
     }
 
     public function getSoldeAttribute()
