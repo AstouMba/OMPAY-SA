@@ -1,40 +1,48 @@
 #!/bin/sh
 
-# Attendre que la base de données soit prête (optionnel)
-if [ -n "$DB_HOST" ]; then
-    echo "Waiting for database connection..."
-    while ! pg_isready -h $DB_HOST -p $DB_PORT -U $DB_USERNAME; do
-        sleep 1
-    done
-    echo "Database is ready!"
+# Basic runtime sanity checks for required DB envs
+echo "Starting docker-entrypoint.sh"
+MISSING=0
+for v in DB_HOST DB_PORT DB_DATABASE DB_USERNAME; do
+  eval val="\$$v"
+  if [ -z "$val" ]; then
+    echo "Required env $v is not set"
+    MISSING=1
+  fi
+done
+
+if [ "$MISSING" -eq 1 ]; then
+  echo "One or more required DB env vars are missing. Aborting to avoid infinite wait." >&2
+  exit 1
 fi
 
-# Installer les clés Passport si elles n'existent pas
-if [ ! -f storage/oauth-private.key ] || [ ! -f storage/oauth-public.key ]; then
-    echo "Installing Passport keys..."
-    php artisan passport:keys --force
+# Generate APP_KEY if not provided via env
+if [ -z "$APP_KEY" ]; then
+  echo "APP_KEY not set — generating one"
+  php artisan key:generate --force || true
 fi
 
-# Générer la clé d'application si non existante
-php artisan key:generate --force
+echo "Waiting for database to be ready..."
+MAX_WAIT=120
+WAITED=0
+while ! pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USERNAME" >/dev/null 2>&1; do
+  if [ "$WAITED" -ge "$MAX_WAIT" ]; then
+    echo "Timeout waiting for database after ${MAX_WAIT}s" >&2
+    exit 1
+  fi
+  echo "Database is unavailable - sleeping 1s (waited=${WAITED}s)"
+  sleep 1
+  WAITED=$((WAITED+1))
+done
 
-# Exécuter les migrations si demandé
-if [ "$RUN_MIGRATIONS" = "true" ]; then
-    echo "Running database migrations..."
-    php artisan migrate --force
-fi
+echo "Database is up - executing migrations"
+# Clear caches to avoid serving stale routes/config from image build
+php artisan route:clear || true
+php artisan config:clear || true
+php artisan cache:clear || true
 
-# Exécuter les seeders si demandé
-if [ "$RUN_SEEDERS" = "true" ]; then
-    echo "Running database seeders..."
-    php artisan db:seed --force
-fi
+# Run migrations (non-blocking failure allowed)
+php artisan migrate --force || true
 
-# Optimiser config, routes et vues pour la production
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Lancer le serveur Laravel
-echo "Starting Laravel server on port ${PORT:-8000}..."
-php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+echo "Starting Laravel application..."
+exec "$@"
