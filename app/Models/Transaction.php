@@ -16,11 +16,11 @@ class Transaction extends Model
 
     protected $fillable = [
         'compte_id',
-        'type', 
+        'marchand_id',
+        'telephone_marchand',
+        'type',
         'montant',
-        'devise',
-        'description',
-        'statut' 
+        'statut'
     ];
 
     public function compte()
@@ -45,7 +45,24 @@ class Transaction extends Model
 
     public function scopeRetrait($query)
     {
-        return $query->whereIn('type', ['retrait', 'paiement_marchand', 'transfert_ompay']);
+        return $query->whereIn('type', ['retrait', 'paiement_marchand', 'transfert_debit']);
+    }
+
+    public function scopeTransfertEntrant($query)
+    {
+        return $query->where('type', 'transfert_credit');
+    }
+
+    public function scopeTransfertSortant($query)
+    {
+        return $query->where('type', 'transfert_debit');
+    }
+
+    public function scopePaiementRecu($query)
+    {
+        // Assuming paiement_marchand is outgoing, so no received payments scope needed if not applicable
+        // If there are received payments, add here. For now, using depot and transfert_credit as positive.
+        return $query->whereIn('type', ['depot', 'transfert_credit']);
     }
 
     public function scopeType($query, $type)

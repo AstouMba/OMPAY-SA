@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('client_id')->constrained('clients')->onDelete('cascade');
 
-            $table->string('numero_compte')->unique(); // Ex: 77xxxxxx / identifiant OM
+            $table->string('numero_compte')->unique(); // Ex: 77xxxxxx 
             $table->enum('type_compte', ['epargne', 'courant', 'ompay'])->default('ompay');
             $table->string('devise')->default('FCFA');
 

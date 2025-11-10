@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Utils\GenererUuid;
 
 class Client extends Model
 {
-    use HasFactory, SoftDeletes, GenererUuid;
+    use HasFactory, GenererUuid;
 
     protected $table = 'clients';
     public $incrementing = false; // UUID
@@ -19,7 +18,7 @@ class Client extends Model
         'nom',
         'prenom',
         'telephone',
-        'email'
+        'nci'
     ];
 
     // Relation avec Compte (OMPay)

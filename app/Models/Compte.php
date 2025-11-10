@@ -9,7 +9,7 @@ use App\Utils\GenererUuid;
 
 class Compte extends Model
 {
-    use HasFactory, SoftDeletes, GenererUuid;
+    use HasFactory, GenererUuid;
 
     protected $table = 'comptes';
     public $incrementing = false; 
@@ -18,9 +18,9 @@ class Compte extends Model
     protected $fillable = [
         'client_id',
         'numero_compte',
-        'nom_titulaire',
+        'type_compte',
         'devise',
-        'statut'
+        'est_supprime'
     ];
 
     public function client()
@@ -43,10 +43,21 @@ class Compte extends Model
         return $query->where('client_id', $clientId);
     }
 
+    public function solde()
+    {
+        $depots = $this->transactions()->depot()->validees()->sum('montant');
+        $transfertsEntrants = $this->transactions()->transfertEntrant()->validees()->sum('montant');
+        $paiementsRecus = $this->transactions()->paiementRecu()->validees()->sum('montant'); // Assuming depot and transfert_credit are positive
+
+        $retraits = $this->transactions()->retrait()->validees()->sum('montant');
+        $transfertsSortants = $this->transactions()->transfertSortant()->validees()->sum('montant');
+        $paiementsEnvoyes = $this->transactions()->where('type', 'paiement_marchand')->validees()->sum('montant');
+
+        return ($depots + $transfertsEntrants + $paiementsRecus) - ($retraits + $transfertsSortants + $paiementsEnvoyes);
+    }
+
     public function getSoldeAttribute()
     {
-        $soldeDepot = $this->transactions()->depot()->sum('montant');
-        $soldeRetrait = $this->transactions()->retrait()->sum('montant');
-        return $soldeDepot - $soldeRetrait;
+        return $this->solde();
     }
 }

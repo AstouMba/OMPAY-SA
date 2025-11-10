@@ -14,9 +14,9 @@ class DatabaseSeeder extends Seeder
         // Appel des seeders individuels
         $this->call([
             MarchandSeeder::class,
-            // ClientSeeder::class,
-            // CompteSeeder::class,
-            // TransactionSeeder::class,
+            ClientSeeder::class,
+            CompteSeeder::class,
+            TransactionSeeder::class,
         ]);
     }
 }

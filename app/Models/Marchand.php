@@ -10,6 +10,8 @@ class Marchand extends Model
     use GenererUuid;
 
     protected $table = 'marchands';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
         'nom',
