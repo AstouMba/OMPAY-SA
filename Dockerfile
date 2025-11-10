@@ -1,19 +1,24 @@
-# Étape 1: Build des dépendances PHP avec Composer
+# Étape 1: Build des dépendances PHP
 FROM composer:2.6 AS composer-build
+
+# Installer l'extension MongoDB nécessaire pour composer install
+RUN apk add --no-cache autoconf g++ make \
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb
 
 WORKDIR /app
 
-# Copier uniquement composer.json et composer.lock
+# Copier les fichiers de dépendances
 COPY composer.json composer.lock ./
 
-# Installer les dépendances PHP (sans dev ni scripts post-install)
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+# Installer les dépendances PHP sans scripts post-install (ignorer les extensions manquantes)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts --ignore-platform-req=ext-pcntl
 
-# Étape 2: Image finale PHP-FPM Alpine pour production
+# Étape 2: Image finale pour l'application
 FROM php:8.3-fpm-alpine
 
-# Installer les extensions PHP nécessaires pour PostgreSQL
-RUN apk add --no-cache postgresql-dev bash git unzip curl \
+# Installer les extensions PHP nécessaires et les outils Postgres
+RUN apk add --no-cache postgresql-dev postgresql-client \
     && docker-php-ext-install pdo pdo_pgsql
 
 # Créer un utilisateur non-root
@@ -39,15 +44,11 @@ RUN mkdir -p storage/framework/{cache,data,sessions,testing,views} \
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Passer à l'utilisateur non-root pour exécuter Laravel
+# Passer à l'utilisateur non-root
 USER laravel
 
-# Exposer le port 8000 (artisan serve)
+# Exposer le port 8000
 EXPOSE 8000
 
-# Health check pour les orchestrateurs
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/api/v1/health || exit 1
-
-# Commande par défaut pour le container
-CMD ["docker-entrypoint.sh"]
+# Commande par défaut
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
