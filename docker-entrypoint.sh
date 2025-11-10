@@ -9,6 +9,12 @@ if [ -n "$DB_HOST" ]; then
     echo "Database is ready!"
 fi
 
+# Installer les clés Passport si elles n'existent pas
+if [ ! -f storage/oauth-private.key ] || [ ! -f storage/oauth-public.key ]; then
+    echo "Installing Passport keys..."
+    php artisan passport:keys --force
+fi
+
 # Générer la clé d'application si non existante
 php artisan key:generate --force
 
