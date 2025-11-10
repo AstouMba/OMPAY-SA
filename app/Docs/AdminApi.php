@@ -5,7 +5,93 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Tag(
  *     name="Administration",
- *     description="Opérations d'administration"
+ *     description="Opérations d'administration et d'authentification admin"
+ * )
+ *
+ * @OA\Post(
+ *     path="/v1/admin/login",
+ *     summary="Connexion administrateur",
+ *     description="Authentification d'un administrateur avec email et mot de passe",
+ *     operationId="adminLogin",
+ *     tags={"Administration"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"email", "password"},
+ *             @OA\Property(property="email", type="string", format="email", description="Email de l'administrateur"),
+ *             @OA\Property(property="password", type="string", format="password", description="Mot de passe")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Connexion réussie",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Connexion réussie"),
+ *             @OA\Property(property="data", type="object",
+ *                 @OA\Property(property="user", ref="#/components/schemas/User"),
+ *                 @OA\Property(property="access_token", type="string", description="Token d'accès"),
+ *                 @OA\Property(property="token_type", type="string", example="Bearer")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Identifiants invalides",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Accès interdit",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     )
+ * )
+ *
+ * @OA\Post(
+ *     path="/v1/admin/logout",
+ *     summary="Déconnexion administrateur",
+ *     description="Déconnexion de l'administrateur connecté",
+ *     operationId="adminLogout",
+ *     tags={"Administration"},
+ *     security={{"bearerAuth": {}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Déconnexion réussie",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Déconnexion réussie")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Token invalide",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     )
+ * )
+ *
+ * @OA\Get(
+ *     path="/v1/admin/user",
+ *     summary="Informations de l'administrateur connecté",
+ *     description="Récupère les informations de l'administrateur actuellement connecté",
+ *     operationId="getAdminUser",
+ *     tags={"Administration"},
+ *     security={{"bearerAuth": {}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Informations récupérées",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="data", ref="#/components/schemas/User")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Non authentifié",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     )
  * )
  *
  * @OA\Post(
@@ -14,6 +100,7 @@ use OpenApi\Annotations as OA;
  *     description="Crée un nouveau client avec son compte associé",
  *     operationId="createClient",
  *     tags={"Administration"},
+ *     security={{"bearerAuth": {}}},
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(ref="#/components/schemas/CreateClientRequest")
@@ -22,6 +109,11 @@ use OpenApi\Annotations as OA;
  *         response=200,
  *         description="Client et compte créés avec succès",
  *         @OA\JsonContent(ref="#/components/schemas/CreateClientResponse")
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Non authentifié",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
  *     @OA\Response(
  *         response=422,

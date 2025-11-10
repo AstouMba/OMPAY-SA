@@ -1,5 +1,23 @@
 {
     "openapi": "3.0.0",
+    "info": {
+        "title": "OmPay API",
+        "description": "API pour l'application OmPay - Système de paiement mobile sénégalais avec authentification double niveau",
+        "contact": {
+            "email": "contact@ompay.sn"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api/v1",
+            "description": "Serveur de développement"
+        },
+        {
+            "url": "https://ompay-api.onrender.com/api/v1",
+            "description": "Serveur de production"
+        }
+    ],
     "paths": {
         "/v1/solde": {
             "get": {
@@ -43,48 +61,7 @@
                 }
             }
         },
-        "/v1/admin/clients": {
-            "post": {
-                "tags": [
-                    "Administration"
-                ],
-                "summary": "Créer un client et son compte",
-                "description": "Crée un nouveau client avec son compte associé",
-                "operationId": "createClient",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateClientRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Client et compte créés avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CreateClientResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Erreur de validation ou données invalides",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
+        "/user": {},
         "/v1/transactions": {
             "get": {
                 "tags": [
@@ -133,6 +110,671 @@
                                         "message": {
                                             "type": "string",
                                             "example": "erreur lors de la recupération des transactions"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/admin/clients": {
+            "post": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Créer un client et son compte",
+                "description": "Crée un nouveau client avec son compte associé",
+                "operationId": "createClient",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateClientRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Client et compte créés avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateClientResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation ou données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/admin/login": {
+            "post": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Connexion administrateur",
+                "description": "Authentification d'un administrateur avec email et mot de passe",
+                "operationId": "adminLogin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "description": "Email de l'administrateur",
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "description": "Mot de passe",
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Connexion réussie"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "$ref": "#/components/schemas/User"
+                                                },
+                                                "access_token": {
+                                                    "description": "Token d'accès",
+                                                    "type": "string"
+                                                },
+                                                "token_type": {
+                                                    "type": "string",
+                                                    "example": "Bearer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Identifiants invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès interdit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/admin/logout": {
+            "post": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Déconnexion administrateur",
+                "description": "Déconnexion de l'administrateur connecté",
+                "operationId": "adminLogout",
+                "responses": {
+                    "200": {
+                        "description": "Déconnexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Déconnexion réussie"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token invalide",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/admin/user": {
+            "get": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Informations de l'administrateur connecté",
+                "description": "Récupère les informations de l'administrateur actuellement connecté",
+                "operationId": "getAdminUser",
+                "responses": {
+                    "200": {
+                        "description": "Informations récupérées",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/client/send-otp": {
+            "post": {
+                "tags": [
+                    "Authentification Client"
+                ],
+                "summary": "Envoyer un code OTP",
+                "description": "Envoie un code OTP au numéro de téléphone du client pour l'authentification",
+                "operationId": "sendOtp",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "telephone"
+                                ],
+                                "properties": {
+                                    "telephone": {
+                                        "description": "Numéro de téléphone sénégalais (format: +221XXXXXXXXX)",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Code OTP envoyé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Code OTP envoyé avec succès"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "otp": {
+                                                    "description": "Code OTP (uniquement en développement)",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Client non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Le client ne possède pas de compte",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Numéro de téléphone invalide",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/client/verify-otp": {
+            "post": {
+                "tags": [
+                    "Authentification Client"
+                ],
+                "summary": "Vérifier le code OTP",
+                "description": "Vérifie le code OTP et connecte le client si valide",
+                "operationId": "verifyOtp",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "telephone",
+                                    "otp"
+                                ],
+                                "properties": {
+                                    "telephone": {
+                                        "description": "Numéro de téléphone sénégalais",
+                                        "type": "string"
+                                    },
+                                    "otp": {
+                                        "description": "Code OTP à 6 chiffres",
+                                        "type": "string",
+                                        "maxLength": 6,
+                                        "minLength": 6
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Connexion réussie"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "client": {
+                                                    "$ref": "#/components/schemas/Client"
+                                                },
+                                                "access_token": {
+                                                    "description": "Token d'accès",
+                                                    "type": "string"
+                                                },
+                                                "token_type": {
+                                                    "type": "string",
+                                                    "example": "Bearer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Code OTP invalide ou expiré",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Client non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/client/logout": {
+            "post": {
+                "tags": [
+                    "Authentification Client"
+                ],
+                "summary": "Déconnexion client",
+                "description": "Déconnecte le client actuellement connecté",
+                "operationId": "clientLogout",
+                "responses": {
+                    "200": {
+                        "description": "Déconnexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Déconnexion réussie"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token invalide",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/client/user": {
+            "get": {
+                "tags": [
+                    "Authentification Client"
+                ],
+                "summary": "Informations du client connecté",
+                "description": "Récupère les informations du client actuellement connecté avec ses comptes",
+                "operationId": "getClientUser",
+                "responses": {
+                    "200": {
+                        "description": "Informations récupérées",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Client"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/client/solde": {
+            "get": {
+                "tags": [
+                    "Authentification Client"
+                ],
+                "summary": "Consulter le solde",
+                "description": "Récupère le solde de tous les comptes du client connecté",
+                "operationId": "getClientSolde",
+                "responses": {
+                    "200": {
+                        "description": "Solde récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SoldeResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v1/client/transactions": {
+            "get": {
+                "tags": [
+                    "Authentification Client"
+                ],
+                "summary": "Historique des transactions",
+                "description": "Récupère l'historique des transactions du client connecté",
+                "operationId": "getClientTransactions",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Numéro de page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Nombre d'éléments par page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transactions récupérées",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "liste des transactions recupérée avec succés"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Transaction"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/health": {
+            "get": {
+                "tags": [
+                    "Health Check"
+                ],
+                "summary": "Vérification de santé",
+                "description": "Endpoint pour vérifier que l'API fonctionne correctement",
+                "operationId": "healthCheck",
+                "responses": {
+                    "200": {
+                        "description": "API opérationnelle",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
                                         }
                                     },
                                     "type": "object"
@@ -438,17 +1080,169 @@
                     }
                 },
                 "type": "object"
+            },
+            "User": {
+                "title": "Utilisateur Administrateur",
+                "description": "Modèle représentant un utilisateur administrateur",
+                "properties": {
+                    "id": {
+                        "description": "ID unique de l'utilisateur",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "Nom de l'utilisateur",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "Email de l'utilisateur",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "role": {
+                        "description": "Rôle de l'utilisateur",
+                        "type": "string",
+                        "enum": [
+                            "admin",
+                            "user"
+                        ]
+                    },
+                    "email_verified_at": {
+                        "description": "Date de vérification email",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "Date de création",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Date de mise à jour",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "LoginRequest": {
+                "title": "Requête de connexion",
+                "description": "Données pour l'authentification",
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "properties": {
+                    "email": {
+                        "description": "Email de l'utilisateur",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "description": "Mot de passe",
+                        "type": "string",
+                        "format": "password"
+                    }
+                },
+                "type": "object"
+            },
+            "OtpRequest": {
+                "title": "Requête d'envoi OTP",
+                "description": "Données pour l'envoi d'un code OTP",
+                "required": [
+                    "telephone"
+                ],
+                "properties": {
+                    "telephone": {
+                        "description": "Numéro de téléphone sénégalais (format: +221XXXXXXXXX)",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "VerifyOtpRequest": {
+                "title": "Requête de vérification OTP",
+                "description": "Données pour vérifier le code OTP",
+                "required": [
+                    "telephone",
+                    "otp"
+                ],
+                "properties": {
+                    "telephone": {
+                        "description": "Numéro de téléphone sénégalais",
+                        "type": "string"
+                    },
+                    "otp": {
+                        "description": "Code OTP à 6 chiffres",
+                        "type": "string",
+                        "maxLength": 6,
+                        "minLength": 6
+                    }
+                },
+                "type": "object"
+            },
+            "AuthResponse": {
+                "title": "Réponse d'authentification",
+                "description": "Réponse après authentification réussie",
+                "properties": {
+                    "success": {
+                        "description": "Statut de succès",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "description": "Message de succès",
+                        "type": "string"
+                    },
+                    "data": {
+                        "properties": {
+                            "user": {
+                                "$ref": "#/components/schemas/User"
+                            },
+                            "client": {
+                                "$ref": "#/components/schemas/Client"
+                            },
+                            "access_token": {
+                                "description": "Token d'accès JWT",
+                                "type": "string"
+                            },
+                            "token_type": {
+                                "description": "Type de token",
+                                "type": "string",
+                                "example": "Bearer"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Token JWT obtenu via l'authentification admin ou client",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
             }
         }
     },
     "tags": [
         {
             "name": "Administration",
-            "description": "Opérations d'administration"
+            "description": "Opérations d'administration et d'authentification admin"
+        },
+        {
+            "name": "Authentification Client",
+            "description": "Opérations d'authentification pour les clients"
         },
         {
             "name": "Comptes",
             "description": "Opérations liées aux comptes"
+        },
+        {
+            "name": "Health Check",
+            "description": "Vérification de l'état de l'API"
         },
         {
             "name": "Transactions",
