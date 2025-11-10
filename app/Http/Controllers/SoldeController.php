@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Services\CompteService;
-use Illuminate\Http\Request;
+use App\Traits\ApiResponses;
+use App\Enums\MessageEnumFr;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class SoldeController extends Controller
 {
+    use ApiResponses;
+
     protected $compteService;
 
     public function __construct(CompteService $compteService)
@@ -20,15 +24,9 @@ class SoldeController extends Controller
         try {
             $soldeData = $this->compteService->getSoldeForClient();
 
-            return response()->json([
-                'success' => true,
-                'data' => $soldeData
-            ]);
+            return $this->successResponse($soldeData, MessageEnumFr::SOLDE_RECUPERE);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 404);
+            return $this->errorResponse($e->getMessage(), Response::HTTP_NOT_FOUND);
         }
     }
 }

@@ -1,0 +1,458 @@
+{
+    "openapi": "3.0.0",
+    "paths": {
+        "/v1/solde": {
+            "get": {
+                "tags": [
+                    "Comptes"
+                ],
+                "summary": "Obtenir le solde du compte",
+                "description": "Récupère le solde actuel du compte du client connecté",
+                "operationId": "getSolde",
+                "responses": {
+                    "200": {
+                        "description": "Solde récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SoldeResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aucun compte trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/admin/clients": {
+            "post": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Créer un client et son compte",
+                "description": "Crée un nouveau client avec son compte associé",
+                "operationId": "createClient",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateClientRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Client et compte créés avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateClientResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation ou données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/transactions": {
+            "get": {
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Lister toutes les transactions",
+                "description": "Récupère la liste de toutes les transactions",
+                "operationId": "getTransactions",
+                "responses": {
+                    "200": {
+                        "description": "Liste des transactions récupérée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "liste des transactions recupérée avec succés"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Transaction"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur lors de la récupération",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "erreur lors de la recupération des transactions"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Client": {
+                "title": "Client",
+                "description": "Modèle représentant un client",
+                "properties": {
+                    "id": {
+                        "description": "ID unique du client",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "nom": {
+                        "description": "Nom du client",
+                        "type": "string"
+                    },
+                    "prenom": {
+                        "description": "Prénom du client",
+                        "type": "string"
+                    },
+                    "telephone": {
+                        "description": "Numéro de téléphone",
+                        "type": "string"
+                    },
+                    "nci": {
+                        "description": "Numéro de carte d'identité",
+                        "type": "string"
+                    },
+                    "date_creation": {
+                        "description": "Date de création",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_modification": {
+                        "description": "Date de mise à jour",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "comptes": {
+                        "description": "Liste des comptes du client",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Compte"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Compte": {
+                "title": "Compte",
+                "description": "Modèle représentant un compte bancaire",
+                "properties": {
+                    "id": {
+                        "description": "ID unique du compte",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "numero_compte": {
+                        "description": "Numéro du compte",
+                        "type": "string"
+                    },
+                    "client": {
+                        "$ref": "#/components/schemas/Client"
+                    },
+                    "type_compte": {
+                        "description": "Type de compte",
+                        "type": "string"
+                    },
+                    "devise": {
+                        "description": "Devise du compte",
+                        "type": "string"
+                    },
+                    "solde": {
+                        "description": "Solde actuel du compte",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "est_supprime": {
+                        "description": "Statut de suppression",
+                        "type": "boolean"
+                    },
+                    "date_creation": {
+                        "description": "Date de création",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_modification": {
+                        "description": "Date de mise à jour",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "transactions": {
+                        "description": "Liste des transactions du compte",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Transaction"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Transaction": {
+                "title": "Transaction",
+                "description": "Modèle représentant une transaction",
+                "properties": {
+                    "id": {
+                        "description": "ID unique de la transaction",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "compte_id": {
+                        "description": "ID du compte",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "marchand": {
+                        "$ref": "#/components/schemas/Marchand"
+                    },
+                    "telephone_marchand": {
+                        "description": "Téléphone du marchand (optionnel)",
+                        "type": "string"
+                    },
+                    "type": {
+                        "description": "Type de transaction",
+                        "type": "string",
+                        "enum": [
+                            "depot",
+                            "retrait",
+                            "transfert_credit",
+                            "transfert_debit",
+                            "paiement_marchand"
+                        ]
+                    },
+                    "montant": {
+                        "description": "Montant de la transaction",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "statut": {
+                        "description": "Statut de la transaction",
+                        "type": "string",
+                        "enum": [
+                            "en_attente",
+                            "validee",
+                            "annulee"
+                        ]
+                    },
+                    "date_creation": {
+                        "description": "Date de création",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_modification": {
+                        "description": "Date de mise à jour",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Marchand": {
+                "title": "Marchand",
+                "description": "Modèle représentant un marchand",
+                "properties": {
+                    "id": {
+                        "description": "ID unique du marchand",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "nom": {
+                        "description": "Nom du marchand",
+                        "type": "string"
+                    },
+                    "code_marchand": {
+                        "description": "Code unique du marchand",
+                        "type": "string"
+                    },
+                    "telephone": {
+                        "description": "Numéro de téléphone du marchand",
+                        "type": "string"
+                    },
+                    "date_creation": {
+                        "description": "Date de création",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "date_modification": {
+                        "description": "Date de mise à jour",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "SoldeResponse": {
+                "title": "Réponse Solde",
+                "description": "Réponse contenant les informations de solde",
+                "properties": {
+                    "success": {
+                        "description": "Statut de succès",
+                        "type": "boolean"
+                    },
+                    "data": {
+                        "properties": {
+                            "solde": {
+                                "description": "Solde actuel",
+                                "type": "number",
+                                "format": "float"
+                            },
+                            "devise": {
+                                "description": "Devise",
+                                "type": "string"
+                            },
+                            "date_mise_a_jour": {
+                                "description": "Date de mise à jour",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "title": "Réponse d'erreur",
+                "description": "Réponse en cas d'erreur",
+                "properties": {
+                    "success": {
+                        "description": "Statut de succès",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "description": "Message d'erreur",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateClientRequest": {
+                "title": "Requête de création de client",
+                "description": "Données requises pour créer un client et son compte",
+                "required": [
+                    "nom",
+                    "prenom",
+                    "telephone",
+                    "nci"
+                ],
+                "properties": {
+                    "nom": {
+                        "description": "Nom du client",
+                        "type": "string"
+                    },
+                    "prenom": {
+                        "description": "Prénom du client",
+                        "type": "string"
+                    },
+                    "telephone": {
+                        "description": "Numéro de téléphone (format sénégalais)",
+                        "type": "string"
+                    },
+                    "nci": {
+                        "description": "Numéro de carte d'identité",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateClientResponse": {
+                "title": "Réponse de création de client",
+                "description": "Réponse après création d'un client et compte",
+                "properties": {
+                    "success": {
+                        "description": "Statut de succès",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "description": "Message de succès",
+                        "type": "string"
+                    },
+                    "data": {
+                        "properties": {
+                            "client": {
+                                "$ref": "#/components/schemas/Client"
+                            },
+                            "compte": {
+                                "$ref": "#/components/schemas/Compte"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Administration",
+            "description": "Opérations d'administration"
+        },
+        {
+            "name": "Comptes",
+            "description": "Opérations liées aux comptes"
+        },
+        {
+            "name": "Transactions",
+            "description": "Opérations liées aux transactions"
+        }
+    ]
+}
