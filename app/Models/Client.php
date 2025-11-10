@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Passport\HasApiTokens;
 use App\Utils\GenererUuid;
 
-class Client extends Model
+class Client extends Authenticatable
 {
-    use HasFactory, GenererUuid;
+    use HasFactory, HasApiTokens, GenererUuid;
 
     protected $table = 'clients';
     public $incrementing = false; // UUID
@@ -18,7 +20,14 @@ class Client extends Model
         'nom',
         'prenom',
         'telephone',
-        'nci'
+        'nci',
+        'otp_code',
+        'otp_expires_at'
+    ];
+
+    protected $hidden = [
+        'otp_code',
+        'otp_expires_at',
     ];
 
     // Relation avec Compte (OMPay)
@@ -44,5 +53,21 @@ class Client extends Model
     public function scopeParTelephone($query, $tel)
     {
         return $query->where('telephone', $tel);
+    }
+
+    /**
+     * Find the client instance for the given username (telephone).
+     */
+    public function findForPassport($username)
+    {
+        return $this->where('telephone', $username)->first();
+    }
+
+    /**
+     * Validate the password of the user for the Passport password grant.
+     */
+    public function validateForPassportPasswordGrant($password)
+    {
+        return $this->otp_code === $password && $this->otp_expires_at > now();
     }
 }
