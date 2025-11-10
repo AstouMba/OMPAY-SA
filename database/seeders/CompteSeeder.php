@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Client;
+use App\Models\Compte;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class CompteSeeder extends Seeder
 {
@@ -12,6 +14,17 @@ class CompteSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $client = Client::first();
+
+        if ($client) {
+            Compte::create([
+                'id' => Str::uuid(),
+                'client_id' => $client->id,
+                'numero_compte' => '+221771234567',
+                'type_compte' => 'ompay',
+                'devise' => 'FCFA',
+                'est_supprime' => false,
+            ]);
+        }
     }
 }
