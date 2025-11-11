@@ -2,7 +2,7 @@
 
 echo "Starting docker-entrypoint.sh"
 
-# Basic runtime sanity checks for required DB envs
+# Check required DB env variables
 MISSING=0
 for v in DB_HOST DB_PORT DB_DATABASE DB_USERNAME; do
   eval val="\$$v"
@@ -13,11 +13,11 @@ for v in DB_HOST DB_PORT DB_DATABASE DB_USERNAME; do
 done
 
 if [ "$MISSING" -eq 1 ]; then
-  echo "One or more required DB env vars are missing. Aborting to avoid infinite wait." >&2
+  echo "One or more required DB env vars are missing. Aborting." >&2
   exit 1
 fi
 
-# Generate APP_KEY if not provided via env
+# Generate APP_KEY if missing
 if [ -z "$APP_KEY" ]; then
   echo "APP_KEY not set — generating one"
   php artisan key:generate --force || true
@@ -31,50 +31,43 @@ while ! pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USERNAME" >/dev/null 2>&1
     echo "Timeout waiting for database after ${MAX_WAIT}s" >&2
     exit 1
   fi
-  echo "Database is unavailable - sleeping 1s (waited=${WAITED}s)"
+  echo "DB unavailable - sleeping 1s (waited ${WAITED}s)"
   sleep 1
   WAITED=$((WAITED+1))
 done
 
-echo "Database is up - executing migrations"
+echo "Database is up - executing runtime init steps"
 
-# Clear caches to avoid serving stale routes/config from image build
+# Clear caches
 php artisan route:clear || true
 php artisan config:clear || true
 php artisan cache:clear || true
 
-# Ensure storage directories exist
-echo "Creating storage directories..."
+echo "Ensuring storage directories exist..."
 mkdir -p storage/api-docs
 mkdir -p storage/framework/{cache,data,sessions,testing,views}
 mkdir -p storage/logs
 mkdir -p bootstrap/cache
 
-# ✅ FIX: Proper permissions for Swagger + Laravel storage
+#  FIX: Change owner to laravel (not www-data)
 echo "Fixing permissions..."
-chown -R www-data:www-data storage bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
-# Generate Swagger documentation
+# Generate Swagger docs
 echo "Generating Swagger documentation..."
-php artisan l5-swagger:generate || {
-  echo "Warning: Swagger generation failed, but continuing..."
-}
+php artisan l5-swagger:generate || echo "⚠ Swagger generation failed (continuing)"
 
-# Verify the generated file
 if [ -f "storage/api-docs/api-docs.json" ]; then
-  echo "✓ Swagger documentation generated successfully"
-  ls -lh storage/api-docs/api-docs.json
+  echo "✓ Swagger generated successfully"
 else
-  echo "⚠ Warning: Swagger documentation file not found"
+  echo "⚠ Swagger file missing"
 fi
 
-# Run migrations
+# Migrate database
 echo "Running migrations..."
 php artisan migrate --force || true
 
-# Rebuild config cache after migrations
 php artisan config:cache || true
 
-echo "Starting Laravel application..."
+echo "Starting Laravel app..."
 exec "$@"
