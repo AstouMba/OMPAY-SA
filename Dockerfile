@@ -1,7 +1,6 @@
 # Étape 1: Build des dépendances PHP
 FROM composer:2.6 AS composer-build
 
-# Installer les extensions nécessaires pour composer install
 RUN apk add --no-cache autoconf g++ make libpng-dev libjpeg-turbo-dev freetype-dev \
     && docker-php-ext-install gd \
     && pecl install mongodb \
@@ -9,49 +8,44 @@ RUN apk add --no-cache autoconf g++ make libpng-dev libjpeg-turbo-dev freetype-d
 
 WORKDIR /app
 
-# Copier les fichiers de dépendances
 COPY composer.json composer.lock ./
 
-# Installer les dépendances PHP sans scripts post-install (ignorer les extensions manquantes)
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts --ignore-platform-req=ext-pcntl --ignore-platform-req=ext-gd
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
+    --no-scripts --ignore-platform-req=ext-pcntl --ignore-platform-req=ext-gd
 
-# Étape 2: Image finale pour l'application
+
+# Étape 2: Image finale
 FROM php:8.3-fpm-alpine
 
-# Installer les extensions PHP nécessaires et les outils Postgres
+# Extensions PHP
 RUN apk add --no-cache postgresql-dev postgresql-client \
     && docker-php-ext-install pdo pdo_pgsql
 
-# Créer un utilisateur non-root
+# Ajouter utilisateur
 RUN addgroup -g 1000 laravel && adduser -G laravel -g laravel -s /bin/sh -D laravel
 
-# Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Copier les dépendances installées depuis l'étape de build
+# Copier vendor depuis l'étape précédente
 COPY --from=composer-build /app/vendor ./vendor
 
-# Copier le reste du code de l'application
+# Copier tout le projet
 COPY . .
 
-# Créer les répertoires nécessaires et définir les permissions
+# Préparer les dossiers et permissions AVANT USER laravel
 RUN mkdir -p storage/framework/{cache,data,sessions,testing,views} \
-    && mkdir -p storage/logs \
-    && mkdir -p storage/api-docs \
-    && mkdir -p bootstrap/cache \
-    && chown -R laravel:laravel /var/www/html \
-    && chmod -R 775 storage bootstrap/cache
+    && mkdir -p storage/logs storage/api-docs bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache \
+    && chown -R laravel:laravel /var/www/html
 
-# Copier le script d'entrée
+# Script d'entrée
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Passer à l'utilisateur non-root
+# Maintenant on peut passer à l'utilisateur laravel
 USER laravel
 
-# Exposer le port 8000
 EXPOSE 8000
 
-# Point d'entrée et commande par défaut
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
