@@ -52,6 +52,7 @@ class TransactionRepository
             ->join('comptes', 'transactions.compte_id', '=', 'comptes.id')
             ->where('comptes.client_id', $clientId)
             ->select('transactions.*')
+            ->with('marchand') // Charger la relation marchand
             ->orderBy('transactions.created_at', 'desc');
 
         // Appliquer les filtres de date
