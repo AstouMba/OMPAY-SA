@@ -14,12 +14,12 @@
             "description": "Serveur de développement"
         },
         {
-            "url": "https://ompay-api.onrender.com/api/v1",
+            "url": "https://ompay-sa.onrender.com/api/v1",
             "description": "Serveur de production"
         }
     ],
     "paths": {
-        "/v1/solde": {
+        "/solde": {
             "get": {
                 "tags": [
                     "Comptes"
@@ -38,7 +38,7 @@
                             }
                         }
                     },
-                    "404": { 
+                    "404": {
                         "description": "Aucun compte trouvé",
                         "content": {
                             "application/json": {
@@ -62,122 +62,8 @@
             }
         },
         "/user": {},
-        "/v1/transactions": {
-            "get": {
-                "tags": [
-                    "Transactions"
-                ],
-                "summary": "Lister toutes les transactions",
-                "description": "Récupère la liste de toutes les transactions",
-                "operationId": "getTransactions",
-                "responses": {
-                    "200": {
-                        "description": "Liste des transactions récupérée",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "liste des transactions recupérée avec succés"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/Transaction"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur lors de la récupération",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "erreur lors de la recupération des transactions"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/admin/clients": {
-            "post": {
-                "tags": [
-                    "Administration"
-                ],
-                "summary": "Créer un client et son compte",
-                "description": "Crée un nouveau client avec son compte associé",
-                "operationId": "createClient",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateClientRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Client et compte créés avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CreateClientResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non authentifié",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Erreur de validation ou données invalides",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/v1/admin/login": {
+        "/v1/admin/clients": {},
+        "/admin/login": {
             "post": {
                 "tags": [
                     "Administration"
@@ -235,6 +121,10 @@
                                                     "description": "Token d'accès",
                                                     "type": "string"
                                                 },
+                                                "refresh_token": {
+                                                    "description": "Token de rafraîchissement (id du token)",
+                                                    "type": "string"
+                                                },
                                                 "token_type": {
                                                     "type": "string",
                                                     "example": "Bearer"
@@ -271,7 +161,7 @@
                 }
             }
         },
-        "/v1/admin/logout": {
+        "/admin/logout": {
             "post": {
                 "tags": [
                     "Administration"
@@ -318,7 +208,7 @@
                 ]
             }
         },
-        "/v1/admin/user": {
+        "/admin/user": {
             "get": {
                 "tags": [
                     "Administration"
@@ -364,7 +254,64 @@
                 ]
             }
         },
-        "/v1/client/send-otp": {
+        "/admin/clients": {
+            "post": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Créer un client et son compte",
+                "description": "Crée un nouveau client avec son compte associé. Remarque : l'admin doit être authentifié (access_token) et posséder un refresh_token obtenu via /v1/admin/login avant d'appeler cette route.",
+                "operationId": "createClient",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateClientRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Client et compte créés avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateClientResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation ou données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/client/send-otp": {
             "post": {
                 "tags": [
                     "Authentification Client"
@@ -454,7 +401,7 @@
                 }
             }
         },
-        "/v1/client/verify-otp": {
+        "/client/verify-otp": {
             "post": {
                 "tags": [
                     "Authentification Client"
@@ -548,7 +495,7 @@
                 }
             }
         },
-        "/v1/client/logout": {
+        "/client/logout": {
             "post": {
                 "tags": [
                     "Authentification Client"
@@ -595,7 +542,7 @@
                 ]
             }
         },
-        "/v1/client/user": {
+        "/client/user": {
             "get": {
                 "tags": [
                     "Authentification Client"
@@ -641,27 +588,66 @@
                 ]
             }
         },
-        "/v1/client/solde": {
+        "/client/qrcode": {
             "get": {
                 "tags": [
-                    "Authentification Client"
+                    "Client QR Code"
                 ],
-                "summary": "Consulter le solde",
-                "description": "Récupère le solde de tous les comptes du client connecté",
-                "operationId": "getClientSolde",
+                "summary": "Récupérer le QR Code du client",
+                "description": "Permet à un client connecté de récupérer le QR Code lié à son compte. Le QR Code contient les informations du numéro de compte et du nom/prénom du client.",
+                "operationId": "getClientQrCode",
                 "responses": {
                     "200": {
-                        "description": "Solde récupéré avec succès",
+                        "description": "QR Code généré avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SoldeResponse"
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ClientQrResponse"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "401": {
                         "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aucun compte actif trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Aucun compte actif trouvé pour ce client."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur lors de la génération du QR Code",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -678,14 +664,14 @@
                 ]
             }
         },
-        "/v1/client/transactions": {
+        "/client/transactions": {
             "get": {
                 "tags": [
-                    "Authentification Client"
+                    "Transactions"
                 ],
                 "summary": "Historique des transactions",
                 "description": "Récupère l'historique des transactions du client connecté",
-                "operationId": "getClientTransactions",
+                "operationId": "getTransactions",
                 "parameters": [
                     {
                         "name": "page",
@@ -744,37 +730,20 @@
                                 }
                             }
                         }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/health": {
-            "get": {
-                "tags": [
-                    "Health Check"
-                ],
-                "summary": "Vérification de santé",
-                "description": "Endpoint pour vérifier que l'API fonctionne correctement",
-                "operationId": "healthCheck",
-                "responses": {
-                    "200": {
-                        "description": "API opérationnelle",
+                    },
+                    "500": {
+                        "description": "Erreur lors de la récupération",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "ok"
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
                                         },
-                                        "timestamp": {
+                                        "message": {
                                             "type": "string",
-                                            "format": "date-time"
+                                            "example": "erreur lors de la recupération des transactions"
                                         }
                                     },
                                     "type": "object"
@@ -782,7 +751,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         }
     },
@@ -1206,6 +1180,10 @@
                                 "description": "Token d'accès JWT",
                                 "type": "string"
                             },
+                            "refresh_token": {
+                                "description": "Token de rafraîchissement (id du token, si applicable)",
+                                "type": "string"
+                            },
                             "token_type": {
                                 "description": "Type de token",
                                 "type": "string",
@@ -1213,6 +1191,23 @@
                             }
                         },
                         "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "ClientQrResponse": {
+                "title": "Réponse QR Code Client",
+                "description": "Réponse contenant le numéro de compte et le QR Code en Base64",
+                "properties": {
+                    "numero_compte": {
+                        "description": "Numéro du compte client",
+                        "type": "string",
+                        "example": "771234567"
+                    },
+                    "qr_code_base64": {
+                        "description": "QR Code encodé en Base64 avec préfixe data URI",
+                        "type": "string",
+                        "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
                     }
                 },
                 "type": "object"
@@ -1237,12 +1232,12 @@
             "description": "Opérations d'authentification pour les clients"
         },
         {
-            "name": "Comptes",
-            "description": "Opérations liées aux comptes"
+            "name": "Client QR Code",
+            "description": "Opérations liées au QR Code du client"
         },
         {
-            "name": "Health Check",
-            "description": "Vérification de l'état de l'API"
+            "name": "Comptes",
+            "description": "Opérations liées aux comptes"
         },
         {
             "name": "Transactions",

@@ -7,6 +7,7 @@ use App\Http\Controllers\SoldeController;
 use App\Http\Controllers\AdminClientController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientAuthController;
+use App\Http\Controllers\ClientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,10 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Health check endpoint
-Route::get('/health', function () {
-    return response()->json(['status' => 'ok', 'timestamp' => now()]);
-});
+
 
 // Admin Authentication Routes
 Route::prefix('v1/admin')->group(function () {
@@ -47,5 +45,6 @@ Route::prefix('v1/client')->group(function () {
         Route::get('/user', [ClientAuthController::class, 'user']);
         Route::get('/solde', [SoldeController::class, 'getSolde']);
         Route::get('/transactions', [TransactionController::class, 'index']);
+        Route::get('/qrcode', [ClientController::class, 'getQrCode']);
     });
 });
