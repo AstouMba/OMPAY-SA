@@ -41,6 +41,9 @@ php artisan route:clear || true
 php artisan config:clear || true
 php artisan cache:clear || true
 
+# Generate Swagger documentation
+php artisan l5-swagger:generate || true
+
 # Run migrations (non-blocking failure allowed)
 php artisan migrate --force || true
 
