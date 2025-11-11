@@ -36,15 +36,35 @@ while ! pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USERNAME" >/dev/null 2>&1
 done
 
 echo "Database is up - executing migrations"
+
 # Clear caches to avoid serving stale routes/config from image build
 php artisan route:clear || true
 php artisan config:clear || true
 php artisan cache:clear || true
 
+# Ensure storage directories exist with proper permissions
+echo "Creating storage directories..."
+mkdir -p storage/api-docs
+mkdir -p storage/framework/{cache,data,sessions,testing,views}
+mkdir -p storage/logs
+mkdir -p bootstrap/cache
+
 # Generate Swagger documentation
-php artisan l5-swagger:generate || true
+echo "Generating Swagger documentation..."
+php artisan l5-swagger:generate || {
+  echo "Warning: Swagger generation failed, but continuing..."
+}
+
+# Verify the generated file
+if [ -f "storage/api-docs/api-docs.json" ]; then
+  echo "✓ Swagger documentation generated successfully"
+  ls -lh storage/api-docs/api-docs.json
+else
+  echo "⚠ Warning: Swagger documentation file not found"
+fi
 
 # Run migrations (non-blocking failure allowed)
+echo "Running migrations..."
 php artisan migrate --force || true
 
 echo "Starting Laravel application..."
