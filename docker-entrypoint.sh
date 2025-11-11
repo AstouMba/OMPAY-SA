@@ -41,6 +41,7 @@ echo "Database is up - executing migrations"
 php artisan route:clear || true
 php artisan config:clear || true
 php artisan cache:clear || true
+php artisan config:cache || true
 
 # Ensure storage directories exist with proper permissions
 echo "Creating storage directories..."
@@ -66,6 +67,9 @@ fi
 # Run migrations (non-blocking failure allowed)
 echo "Running migrations..."
 php artisan migrate --force || true
+
+# Force config cache regeneration after migrations to ensure proper config loading
+php artisan config:cache || true
 
 echo "Starting Laravel application..."
 exec "$@"
