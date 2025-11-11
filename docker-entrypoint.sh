@@ -1,7 +1,8 @@
 #!/bin/sh
 
-# Basic runtime sanity checks for required DB envs
 echo "Starting docker-entrypoint.sh"
+
+# Basic runtime sanity checks for required DB envs
 MISSING=0
 for v in DB_HOST DB_PORT DB_DATABASE DB_USERNAME; do
   eval val="\$$v"
@@ -41,14 +42,18 @@ echo "Database is up - executing migrations"
 php artisan route:clear || true
 php artisan config:clear || true
 php artisan cache:clear || true
-php artisan config:cache || true
 
-# Ensure storage directories exist with proper permissions
+# Ensure storage directories exist
 echo "Creating storage directories..."
 mkdir -p storage/api-docs
 mkdir -p storage/framework/{cache,data,sessions,testing,views}
 mkdir -p storage/logs
 mkdir -p bootstrap/cache
+
+# ✅ FIX: Proper permissions for Swagger + Laravel storage
+echo "Fixing permissions..."
+chown -R www-data:www-data storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
 
 # Generate Swagger documentation
 echo "Generating Swagger documentation..."
@@ -64,11 +69,11 @@ else
   echo "⚠ Warning: Swagger documentation file not found"
 fi
 
-# Run migrations (non-blocking failure allowed)
+# Run migrations
 echo "Running migrations..."
 php artisan migrate --force || true
 
-# Force config cache regeneration after migrations to ensure proper config loading
+# Rebuild config cache after migrations
 php artisan config:cache || true
 
 echo "Starting Laravel application..."
