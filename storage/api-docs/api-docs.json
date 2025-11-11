@@ -19,48 +19,6 @@
         }
     ],
     "paths": {
-        "/solde": {
-            "get": {
-                "tags": [
-                    "Comptes"
-                ],
-                "summary": "Obtenir le solde du compte",
-                "description": "Récupère le solde actuel du compte du client connecté",
-                "operationId": "getSolde",
-                "responses": {
-                    "200": {
-                        "description": "Solde récupéré avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SoldeResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Aucun compte trouvé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur serveur",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/user": {},
         "/v1/admin/clients": {},
         "/admin/login": {
@@ -84,12 +42,14 @@
                                     "email": {
                                         "description": "Email de l'administrateur",
                                         "type": "string",
-                                        "format": "email"
+                                        "format": "email",
+                                        "example": "admin@example.com"
                                     },
                                     "password": {
                                         "description": "Mot de passe",
                                         "type": "string",
-                                        "format": "password"
+                                        "format": "password",
+                                        "example": "secret123"
                                     }
                                 },
                                 "type": "object"
@@ -208,52 +168,6 @@
                 ]
             }
         },
-        "/admin/user": {
-            "get": {
-                "tags": [
-                    "Administration"
-                ],
-                "summary": "Informations de l'administrateur connecté",
-                "description": "Récupère les informations de l'administrateur actuellement connecté",
-                "operationId": "getAdminUser",
-                "responses": {
-                    "200": {
-                        "description": "Informations récupérées",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/User"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non authentifié",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/admin/clients": {
             "post": {
                 "tags": [
@@ -311,6 +225,305 @@
                 ]
             }
         },
+        "/admin/transaction-fees": {
+            "get": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Lister les configurations de frais",
+                "description": "Récupère toutes les configurations de frais de transaction",
+                "operationId": "getTransactionFees",
+                "responses": {
+                    "200": {
+                        "description": "Configurations récupérées",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Configurations de frais récupérées avec succès"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "type_transaction": {
+                                                        "type": "string",
+                                                        "example": "transfert"
+                                                    },
+                                                    "pourcentage_frais": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 0.008
+                                                    },
+                                                    "frais_fixe": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 0
+                                                    },
+                                                    "actif": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/transaction-fees/{type}": {
+            "put": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Modifier les frais d'un type de transaction",
+                "description": "Met à jour la configuration des frais pour un type de transaction spécifique",
+                "operationId": "updateTransactionFee",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "Type de transaction (transfert, paiement_marchand, retrait, depot)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "transfert"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "pourcentage_frais": {
+                                        "description": "Pourcentage des frais (0.01 = 1%)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0.01
+                                    },
+                                    "frais_fixe": {
+                                        "description": "Frais fixe en FCFA",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 100
+                                    },
+                                    "actif": {
+                                        "description": "Activer/désactiver ces frais",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Configuration mise à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Configuration de frais mise à jour avec succès"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "type_transaction": {
+                                                    "type": "string",
+                                                    "example": "transfert"
+                                                },
+                                                "pourcentage_frais": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 0.01
+                                                },
+                                                "frais_fixe": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 100
+                                                },
+                                                "actif": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur lors de la mise à jour"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/transaction-fees/calculate": {
+            "post": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Calculer les frais",
+                "description": "Calcule les frais pour un montant et un type de transaction donnés",
+                "operationId": "calculateTransactionFees",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "montant": {
+                                        "description": "Montant de la transaction",
+                                        "type": "integer",
+                                        "example": 3000
+                                    },
+                                    "type_transaction": {
+                                        "description": "Type de transaction (optionnel, défaut: transfert)",
+                                        "type": "string",
+                                        "example": "transfert"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Frais calculés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Frais calculés avec succès"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "montant": {
+                                                    "type": "integer",
+                                                    "example": 3000
+                                                },
+                                                "type_transaction": {
+                                                    "type": "string",
+                                                    "example": "transfert"
+                                                },
+                                                "frais_calcules": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 24
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/client/send-otp": {
             "post": {
                 "tags": [
@@ -330,7 +543,8 @@
                                 "properties": {
                                     "telephone": {
                                         "description": "Numéro de téléphone sénégalais (format: +221XXXXXXXXX)",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "+221771234567"
                                     }
                                 },
                                 "type": "object"
@@ -421,13 +635,15 @@
                                 "properties": {
                                     "telephone": {
                                         "description": "Numéro de téléphone sénégalais",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "+221771234567"
                                     },
                                     "otp": {
                                         "description": "Code OTP à 6 chiffres",
                                         "type": "string",
                                         "maxLength": 6,
-                                        "minLength": 6
+                                        "minLength": 6,
+                                        "example": "123456"
                                     }
                                 },
                                 "type": "object"
@@ -584,128 +800,6 @@
                 ]
             }
         },
-        "/client/user": {
-            "get": {
-                "tags": [
-                    "Authentification Client"
-                ],
-                "summary": "Informations du client connecté",
-                "description": "Récupère les informations du client actuellement connecté avec ses comptes",
-                "operationId": "getClientUser",
-                "responses": {
-                    "200": {
-                        "description": "Informations récupérées",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/Client"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non authentifié",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/client/qrcode": {
-            "get": {
-                "tags": [
-                    "Client QR Code"
-                ],
-                "summary": "Récupérer le QR Code du client",
-                "description": "Permet à un client connecté de récupérer le QR Code lié à son compte. Le QR Code contient les informations du numéro de compte et du nom/prénom du client.",
-                "operationId": "getClientQrCode",
-                "responses": {
-                    "200": {
-                        "description": "QR Code généré avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/ClientQrResponse"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non authentifié",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Aucun compte actif trouvé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Aucun compte actif trouvé pour ce client."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur lors de la génération du QR Code",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/client/transactions": {
             "get": {
                 "tags": [
@@ -786,6 +880,315 @@
                                         "message": {
                                             "type": "string",
                                             "example": "erreur lors de la recupération des transactions"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/client/transactions/payment": {
+            "post": {
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Paiement marchand",
+                "description": "Effectue un paiement chez un marchand",
+                "operationId": "payment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "code_marchand": {
+                                        "description": "Code du marchand",
+                                        "type": "string",
+                                        "example": "M123456"
+                                    },
+                                    "numero_marchand": {
+                                        "description": "Numéro de téléphone du marchand",
+                                        "type": "string",
+                                        "example": "771234567"
+                                    },
+                                    "montant": {
+                                        "description": "Montant du paiement",
+                                        "type": "integer",
+                                        "example": 5000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Paiement effectué",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Paiement effectué avec succès"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "transaction_id": {
+                                                    "type": "string",
+                                                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "paiement_marchand"
+                                                },
+                                                "identifiant_marchand": {
+                                                    "type": "string",
+                                                    "example": "M123456"
+                                                },
+                                                "montant": {
+                                                    "type": "string",
+                                                    "example": "-5000"
+                                                },
+                                                "solde_apres": {
+                                                    "type": "integer",
+                                                    "example": 95000
+                                                },
+                                                "date_creation": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-11-09T10:05:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Solde insuffisant"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur lors du paiement"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/client/transactions/transfert": {
+            "post": {
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Transfert entre clients OMPay",
+                "description": "Effectue un transfert d'argent vers un autre client OMPay",
+                "operationId": "transfert",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "numero_ompay": {
+                                        "description": "Numéro OMPay du destinataire",
+                                        "type": "string",
+                                        "example": "771234568"
+                                    },
+                                    "montant": {
+                                        "description": "Montant du transfert",
+                                        "type": "integer",
+                                        "example": 3000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Transfert effectué avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Transfert effectué avec succès"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "transaction_id": {
+                                                    "type": "string",
+                                                    "example": "550e8400-e29b-41d4-a716-446655440001"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "transfert"
+                                                },
+                                                "montant": {
+                                                    "type": "integer",
+                                                    "example": 3000
+                                                },
+                                                "frais": {
+                                                    "type": "integer",
+                                                    "example": 24
+                                                },
+                                                "emetteur": {
+                                                    "properties": {
+                                                        "numero_ompay": {
+                                                            "type": "string",
+                                                            "example": "771234567"
+                                                        },
+                                                        "solde_apres": {
+                                                            "type": "integer",
+                                                            "example": 92024
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "destinataire": {
+                                                    "properties": {
+                                                        "numero_ompay": {
+                                                            "type": "string",
+                                                            "example": "771234568"
+                                                        },
+                                                        "nom_prenom": {
+                                                            "type": "string",
+                                                            "example": "Moussa Diallo"
+                                                        },
+                                                        "montant_recu": {
+                                                            "type": "integer",
+                                                            "example": 3000
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "date_creation": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-11-09T10:05:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Solde insuffisant"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur lors du transfert"
                                         }
                                     },
                                     "type": "object"
@@ -935,9 +1338,8 @@
                         ]
                     },
                     "montant": {
-                        "description": "Montant de la transaction",
-                        "type": "number",
-                        "format": "float"
+                        "description": "Montant de la transaction (avec préfixe + ou - selon le type)",
+                        "type": "string"
                     },
                     "statut": {
                         "description": "Statut de la transaction",
@@ -1258,23 +1660,9 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "description": "Token JWT obtenu via l'authentification admin ou client",
+                "scheme": "bearer",
                 "bearerFormat": "JWT",
-                "scheme": "bearer"
-            },
-            "passport": {
-                "type": "oauth2",
-                "description": "Laravel Passport OAuth2",
-                "flows": {
-                    "password": {
-                        "authorizationUrl": "http://localhost/oauth/authorize",
-                        "tokenUrl": "http://localhost/oauth/token",
-                        "refreshUrl": "http://localhost/oauth/token/refresh",
-                        "scopes": {
-                            "*": "All scopes"
-                        }
-                    }
-                }
+                "description": "Token JWT obtenu via l'authentification admin ou client"
             }
         }
     },
@@ -1288,23 +1676,13 @@
             "description": "Opérations d'authentification pour les clients"
         },
         {
-            "name": "Client QR Code",
-            "description": "Opérations liées au QR Code du client"
-        },
-        {
-            "name": "Comptes",
-            "description": "Opérations liées aux comptes"
-        },
-        {
             "name": "Transactions",
             "description": "Opérations liées aux transactions"
         }
     ],
     "security": [
         {
-            "passport": [
-                "*"
-            ]
+            "bearerAuth": []
         }
     ]
 }

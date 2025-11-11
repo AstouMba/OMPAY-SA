@@ -64,4 +64,54 @@ class TransactionController extends Controller
         }
     }
 
+    /**
+     * Effectue un paiement chez un marchand
+     */
+    public function payment(Request $request)
+    {
+        try {
+            $client = auth('client')->user();
+            if (!$client) {
+                return $this->errorResponse('Client non authentifié', Response::HTTP_UNAUTHORIZED);
+            }
+
+            $data = $request->only(['code_marchand', 'numero_marchand', 'montant']);
+
+            $result = $this->transactionService->processPayment($client->id, $data);
+
+            return $this->successResponse($result, 'Paiement effectué avec succès');
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+            if ($message === 'Solde insuffisant' || $message === 'Marchand non valide') {
+                return $this->errorResponse($message, Response::HTTP_BAD_REQUEST);
+            }
+            return $this->errorResponse('Erreur lors du paiement', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Effectue un transfert vers un autre client OMPay
+     */
+    public function transfert(Request $request)
+    {
+        try {
+            $client = auth('client')->user();
+            if (!$client) {
+                return $this->errorResponse('Client non authentifié', Response::HTTP_UNAUTHORIZED);
+            }
+
+            $data = $request->only(['numero_ompay', 'montant']);
+
+            $result = $this->transactionService->processTransfert($client->id, $data);
+
+            return $this->successResponse($result, 'Transfert effectué avec succès');
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+            if (in_array($message, ['Solde insuffisant', 'Destinataire non valide', 'Impossible de se transférer à soi-même'])) {
+                return $this->errorResponse($message, Response::HTTP_BAD_REQUEST);
+            }
+            return $this->errorResponse('Erreur lors du transfert', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

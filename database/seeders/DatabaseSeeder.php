@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             ClientSeeder::class,
             CompteSeeder::class,
             TransactionSeeder::class,
+            TransactionFeeSeeder::class,
         ]);
     }
 }

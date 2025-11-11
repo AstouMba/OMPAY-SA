@@ -18,7 +18,7 @@ use OpenApi\Annotations as OA;
  *         required=true,
  *         @OA\JsonContent(
  *             required={"telephone"},
- *             @OA\Property(property="telephone", type="string", description="Numéro de téléphone sénégalais (format: +221XXXXXXXXX)")
+ *             @OA\Property(property="telephone", type="string", example="+221771234567", description="Numéro de téléphone sénégalais (format: +221XXXXXXXXX)")
  *         )
  *     ),
  *     @OA\Response(
@@ -60,8 +60,8 @@ use OpenApi\Annotations as OA;
  *         required=true,
  *         @OA\JsonContent(
  *             required={"telephone", "otp"},
- *             @OA\Property(property="telephone", type="string", description="Numéro de téléphone sénégalais"),
- *             @OA\Property(property="otp", type="string", minLength=6, maxLength=6, description="Code OTP à 6 chiffres")
+ *             @OA\Property(property="telephone", type="string", example="+221771234567", description="Numéro de téléphone sénégalais"),
+ *             @OA\Property(property="otp", type="string", minLength=6, maxLength=6, example="123456", description="Code OTP à 6 chiffres")
  *         )
  *     ),
  *     @OA\Response(
@@ -124,30 +124,7 @@ use OpenApi\Annotations as OA;
  *     )
  * )
  *
- * @OA\Get(
- *     path="/client/user",
- *     summary="Informations du client connecté",
- *     description="Récupère les informations du client actuellement connecté avec ses comptes",
- *     operationId="getClientUser",
- *     tags={"Authentification Client"},
- *     security={{"bearerAuth": {}}},
- *     @OA\Response(
- *         response=200,
- *         description="Informations récupérées",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="success", type="boolean", example=true),
- *             @OA\Property(property="data", ref="#/components/schemas/Client")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Non authentifié",
- *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
- *     )
- * )
- *
- 
+
 
  */
 class AuthApi{}

@@ -47,7 +47,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="marchand", ref="#/components/schemas/Marchand", description="Informations du marchand (optionnel)"),
  *     @OA\Property(property="telephone_marchand", type="string", description="Téléphone du marchand (optionnel)"),
  *     @OA\Property(property="type", type="string", enum={"depot", "retrait", "transfert_credit", "transfert_debit", "paiement_marchand"}, description="Type de transaction"),
- *     @OA\Property(property="montant", type="number", format="float", description="Montant de la transaction"),
+ *     @OA\Property(property="montant", type="string", description="Montant de la transaction (avec préfixe + ou - selon le type)"),
  *     @OA\Property(property="statut", type="string", enum={"en_attente", "validee", "annulee"}, description="Statut de la transaction"),
  *     @OA\Property(property="date_creation", type="string", format="date-time", description="Date de création"),
  *     @OA\Property(property="date_modification", type="string", format="date-time", description="Date de mise à jour")

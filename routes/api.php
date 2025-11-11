@@ -3,11 +3,10 @@
 use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SoldeController;
 use App\Http\Controllers\AdminClientController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientAuthController;
-use App\Http\Controllers\ClientController;
+use App\Http\Controllers\TransactionFeeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,8 +30,10 @@ Route::prefix('v1/admin')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::middleware('auth:admin')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
-        Route::get('/user', [AuthController::class, 'user']);
         Route::post('/clients', [AdminClientController::class, 'create']);
+        Route::get('/transaction-fees', [TransactionFeeController::class, 'index']);
+        Route::put('/transaction-fees/{type}', [TransactionFeeController::class, 'updateByType']);
+        Route::post('/transaction-fees/calculate', [TransactionFeeController::class, 'calculate']);
     });
 });
 
@@ -42,9 +43,8 @@ Route::prefix('v1/client')->group(function () {
     Route::post('/verify-otp', [ClientAuthController::class, 'verifyOtp']);
     Route::middleware('auth:client')->group(function () {
         Route::post('/logout', [ClientAuthController::class, 'logout']);
-        Route::get('/user', [ClientAuthController::class, 'user']);
-        Route::get('/solde', [SoldeController::class, 'getSolde']);
         Route::get('/transactions', [TransactionController::class, 'index']);
-        Route::get('/qrcode', [ClientController::class, 'getQrCode']);
+        Route::post('/transactions/payment', [TransactionController::class, 'payment']);
+        Route::post('/transactions/transfert', [TransactionController::class, 'transfert']);
     });
 });
