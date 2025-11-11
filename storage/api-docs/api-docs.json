@@ -1219,6 +1219,20 @@
                 "description": "Token JWT obtenu via l'authentification admin ou client",
                 "bearerFormat": "JWT",
                 "scheme": "bearer"
+            },
+            "passport": {
+                "type": "oauth2",
+                "description": "Laravel Passport OAuth2",
+                "flows": {
+                    "password": {
+                        "authorizationUrl": "http://localhost/oauth/authorize",
+                        "tokenUrl": "http://localhost/oauth/token",
+                        "refreshUrl": "http://localhost/oauth/token/refresh",
+                        "scopes": {
+                            "*": "All scopes"
+                        }
+                    }
+                }
             }
         }
     },
@@ -1242,6 +1256,13 @@
         {
             "name": "Transactions",
             "description": "Opérations liées aux transactions"
+        }
+    ],
+    "security": [
+        {
+            "passport": [
+                "*"
+            ]
         }
     ]
 }

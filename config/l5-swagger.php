@@ -48,6 +48,8 @@ return [
                 'annotations' => [
                     base_path('app'),
                 ],
+                 'base' => env('L5_SWAGGER_BASE_PATH', null),
+
             ],
         ],
     ],
