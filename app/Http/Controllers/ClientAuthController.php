@@ -48,7 +48,6 @@ class ClientAuthController extends Controller
 
         return $this->successResponse([
             'message' => MessageEnumFr::OTP_ENVOYE,
-            'otp' => $otp, // Remove this in production, only for testing
         ]);
     }
 
