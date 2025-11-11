@@ -37,6 +37,7 @@ COPY . .
 # Créer les répertoires nécessaires et définir les permissions
 RUN mkdir -p storage/framework/{cache,data,sessions,testing,views} \
     && mkdir -p storage/logs \
+    && mkdir -p storage/api-docs \
     && mkdir -p bootstrap/cache \
     && chown -R laravel:laravel /var/www/html \
     && chmod -R 775 storage bootstrap/cache
@@ -51,5 +52,6 @@ USER laravel
 # Exposer le port 8000
 EXPOSE 8000
 
-# Commande par défaut
+# Point d'entrée et commande par défaut
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
