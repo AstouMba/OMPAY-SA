@@ -70,22 +70,11 @@ class ClientAuthController extends Controller
         // Create access token for client
         $token = $client->createToken('ClientToken');
 
-        // Fetch additional data for dashboard
-        $solde = $this->compteService->getSoldeForClient();
-        $qrCode = $this->qrCodeService->generateClientQrCode($client);
-        $transactions = $this->transactionService->getTransactionsForAuthenticatedClient($client->id, [], 10)->items();
-
-        // Enrichir les transactions avec les informations des destinataires
-        $transactions = $this->enrichirTransactionsAvecDestinataires($transactions);
-
         return $this->successResponse([
             'client' => $client->load('comptes'),
             'access_token' => $token->accessToken,
             'refresh_token' => $token->token->id, // Laravel Passport refresh token
             'token_type' => 'Bearer',
-            'solde' => $solde,
-            'qr_code' => $qrCode,
-            'transactions' => $transactions,
         ], MessageEnumFr::LOGIN_REUSSI);
     }
 
