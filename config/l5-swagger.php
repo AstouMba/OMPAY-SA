@@ -2,68 +2,56 @@
 
 return [
     'default' => 'default',
+
     'documentations' => [
         'default' => [
+
             'api' => [
                 'title' => 'OmPay API Documentation',
             ],
 
             'routes' => [
-                /*
-                 * Route for accessing api documentation interface
-                 */
+                // Route Swagger UI
                 'api' => 'api/documentation',
-                'docs' => 'docs',              
-            ],
-            
-            'paths' => [
-                /*
-                 * Absolute path to location where parsed annotations will be stored
-                 */
-                'docs' => storage_path('api-docs'),
-                
-                /*
-                 * Edit to include full URL in ui for assets
-                 */
-                'use_absolute_path' => env('L5_SWAGGER_USE_ABSOLUTE_PATH', false),
 
-               
-                'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'vendor/swagger-api/swagger-ui/dist/'),
-                
+                // Ne surtout pas toucher sinon 404 UI
+                'docs' => 'docs',
+            ],
+
+            'paths' => [
+                // ✅ Chemin correct en prod Render
+                'docs' => base_path('storage/api-docs'),
+
+                // Laisser en false sinon paths deviennent en absolu domaine root
+                'use_absolute_path' => false,
+
+                // Assets Swagger UI
+                'swagger_ui_assets_path' => 'vendor/swagger-api/swagger-ui/dist/',
+
+                // Nom du JSON Swagger à servir
                 'docs_json' => 'api-docs.json',
                 'docs_yaml' => 'api-docs.yaml',
-                'format_to_use_for_docs' => env('L5_FORMAT_TO_USE_FOR_DOCS', 'json'),
+
+                // Format généré (JSON)
+                'format_to_use_for_docs' => 'json',
+
+                // ✅ Scan les annotations dans app/
                 'annotations' => [
-                    app_path('Docs'),
+                    base_path('app'),
                 ],
-                
-                /*
-                 * Edit to set the api's base path
-                 */
+
                 'base' => env('L5_SWAGGER_BASE_PATH', null),
-                
-                /*
-                 * Absolute path to directories that should be excluded from scanning
-                 */
                 'excludes' => [],
             ],
         ],
     ],
-    'defaults' => [
-        'routes' => [
-            /*
-             * Route for accessing parsed swagger annotations.
-             */
-            'docs' => 'docs',
 
-            /*
-             * Route for Oauth2 authentication callback.
-             */
+    'defaults' => [
+
+        'routes' => [
+            'docs' => 'docs',
             'oauth2_callback' => 'api/oauth2-callback',
 
-            /*
-             * Middleware allows to prevent unexpected access to API documentation
-             */
             'middleware' => [
                 'api' => [],
                 'asset' => [],
@@ -71,33 +59,15 @@ return [
                 'oauth2_callback' => [],
             ],
 
-            /*
-             * Route Group options
-             */
             'group_options' => [],
         ],
 
         'paths' => [
-            /*
-             * Absolute path to location where parsed annotations will be stored
-             */
-            'docs' => storage_path('api-docs'),
+            // ✅ Correction ici aussi → même dossier
+            'docs' => base_path('storage/api-docs'),
 
-            /*
-             * Absolute path to directory where to export views
-             */
             'views' => base_path('resources/views/vendor/l5-swagger'),
-
-            /*
-             * Edit to set the api's base path
-             */
             'base' => env('L5_SWAGGER_BASE_PATH', null),
-
-            /*
-             * Absolute path to directories that should be excluded from scanning
-             * @deprecated Please use `scanOptions.exclude`
-             * `scanOptions.exclude` overwrites this
-             */
             'excludes' => [],
         ],
 
@@ -129,36 +99,35 @@ return [
                 ],
             ],
             'security' => [
-                [
-                    'passport' => ['*'],
-                ],
+                ['passport' => ['*']],
             ],
         ],
 
-        'generate_always' => env('L5_SWAGGER_GENERATE_ALWAYS', false),
-        'generate_yaml_copy' => env('L5_SWAGGER_GENERATE_YAML_COPY', false),
+        // ✅ Force regen sur chaque déploiement → évite 404
+        'generate_always' => true,
+
+        'generate_yaml_copy' => false,
         'proxy' => null,
         'additional_config_url' => null,
-        'operations_sort' => env('L5_SWAGGER_OPERATIONS_SORT', null),
+        'operations_sort' => null,
         'validator_url' => null,
 
         'ui' => [
             'display' => [
-                'dark_mode' => env('L5_SWAGGER_UI_DARK_MODE', false),
-                'doc_expansion' => env('L5_SWAGGER_UI_DOC_EXPANSION', 'none'),
-                'filter' => env('L5_SWAGGER_UI_FILTERS', true),
+                'dark_mode' => false,
+                'doc_expansion' => 'none',
+                'filter' => true,
             ],
-
             'authorization' => [
-                'persist_authorization' => env('L5_SWAGGER_UI_PERSIST_AUTHORIZATION', false),
+                'persist_authorization' => false,
                 'oauth2' => [
                     'use_pkce_with_authorization_code_grant' => false,
                 ],
             ],
         ],
-        
+
         'constants' => [
-            'L5_SWAGGER_CONST_HOST' => env('L5_SWAGGER_CONST_HOST', 'http://my-default-host.com'),
+            'L5_SWAGGER_CONST_HOST' => env('APP_URL'),
         ],
     ],
 ];
