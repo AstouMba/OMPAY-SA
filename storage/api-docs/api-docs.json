@@ -459,9 +459,51 @@
                                                     "description": "Token d'accès",
                                                     "type": "string"
                                                 },
+                                                "refresh_token": {
+                                                    "description": "Token de rafraîchissement",
+                                                    "type": "string"
+                                                },
                                                 "token_type": {
                                                     "type": "string",
                                                     "example": "Bearer"
+                                                },
+                                                "solde": {
+                                                    "properties": {
+                                                        "solde": {
+                                                            "description": "Solde du compte",
+                                                            "type": "number",
+                                                            "format": "float"
+                                                        },
+                                                        "devise": {
+                                                            "type": "string",
+                                                            "example": "FCFA"
+                                                        },
+                                                        "date_mise_a_jour": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "qr_code": {
+                                                    "properties": {
+                                                        "numero_compte": {
+                                                            "description": "Numéro du compte",
+                                                            "type": "string"
+                                                        },
+                                                        "qr_code_base64": {
+                                                            "description": "QR code en base64",
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "transactions": {
+                                                    "description": "Dernières transactions (max 10)",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Transaction"
+                                                    }
                                                 }
                                             },
                                             "type": "object"

@@ -74,7 +74,18 @@ use OpenApi\Annotations as OA;
  *             @OA\Property(property="data", type="object",
  *                 @OA\Property(property="client", ref="#/components/schemas/Client"),
  *                 @OA\Property(property="access_token", type="string", description="Token d'accès"),
- *                 @OA\Property(property="token_type", type="string", example="Bearer")
+ *                 @OA\Property(property="refresh_token", type="string", description="Token de rafraîchissement"),
+ *                 @OA\Property(property="token_type", type="string", example="Bearer"),
+ *                 @OA\Property(property="solde", type="object",
+ *                     @OA\Property(property="solde", type="number", format="float", description="Solde du compte"),
+ *                     @OA\Property(property="devise", type="string", example="FCFA"),
+ *                     @OA\Property(property="date_mise_a_jour", type="string", format="date-time")
+ *                 ),
+ *                 @OA\Property(property="qr_code", type="object",
+ *                     @OA\Property(property="numero_compte", type="string", description="Numéro du compte"),
+ *                     @OA\Property(property="qr_code_base64", type="string", description="QR code en base64")
+ *                 ),
+ *                 @OA\Property(property="transactions", type="array", description="Dernières transactions (max 10)", @OA\Items(ref="#/components/schemas/Transaction"))
  *             )
  *         )
  *     ),
