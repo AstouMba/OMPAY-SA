@@ -1,8 +1,9 @@
 # Étape 1: Build des dépendances PHP
 FROM composer:2.6 AS composer-build
 
-# Installer l'extension MongoDB nécessaire pour composer install
-RUN apk add --no-cache autoconf g++ make \
+# Installer les extensions nécessaires pour composer install
+RUN apk add --no-cache autoconf g++ make libpng-dev libjpeg-turbo-dev freetype-dev \
+    && docker-php-ext-install gd \
     && pecl install mongodb \
     && docker-php-ext-enable mongodb
 
@@ -12,7 +13,7 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 
 # Installer les dépendances PHP sans scripts post-install (ignorer les extensions manquantes)
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts --ignore-platform-req=ext-pcntl
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts --ignore-platform-req=ext-pcntl --ignore-platform-req=ext-gd
 
 # Étape 2: Image finale pour l'application
 FROM php:8.3-fpm-alpine
