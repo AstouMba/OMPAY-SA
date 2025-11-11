@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         // Appel des seeders individuels
         $this->call([
+            AdminSeeder::class,
             MarchandSeeder::class,
             ClientSeeder::class,
             CompteSeeder::class,

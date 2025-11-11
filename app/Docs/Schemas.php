@@ -167,8 +167,18 @@ use OpenApi\Annotations as OA;
  *         @OA\Property(property="user", ref="#/components/schemas/User", description="Informations utilisateur (admin)"),
  *         @OA\Property(property="client", ref="#/components/schemas/Client", description="Informations client"),
  *         @OA\Property(property="access_token", type="string", description="Token d'accès JWT"),
+ *         @OA\Property(property="refresh_token", type="string", description="Token de rafraîchissement (id du token, si applicable)"),
  *         @OA\Property(property="token_type", type="string", example="Bearer", description="Type de token")
  *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ClientQrResponse",
+ *     type="object",
+ *     title="Réponse QR Code Client",
+ *     description="Réponse contenant le numéro de compte et le QR Code en Base64",
+ *     @OA\Property(property="numero_compte", type="string", example="771234567", description="Numéro du compte client"),
+ *     @OA\Property(property="qr_code_base64", type="string", example="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...", description="QR Code encodé en Base64 avec préfixe data URI")
  * )
  */
 class Schemas {}

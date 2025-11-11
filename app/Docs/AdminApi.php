@@ -9,7 +9,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Post(
- *     path="/v1/admin/login",
+ *     path="/admin/login",
  *     summary="Connexion administrateur",
  *     description="Authentification d'un administrateur avec email et mot de passe",
  *     operationId="adminLogin",
@@ -32,6 +32,7 @@ use OpenApi\Annotations as OA;
  *             @OA\Property(property="data", type="object",
  *                 @OA\Property(property="user", ref="#/components/schemas/User"),
  *                 @OA\Property(property="access_token", type="string", description="Token d'accès"),
+ *                 @OA\Property(property="refresh_token", type="string", description="Token de rafraîchissement (id du token)") ,
  *                 @OA\Property(property="token_type", type="string", example="Bearer")
  *             )
  *         )
@@ -49,7 +50,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Post(
- *     path="/v1/admin/logout",
+ *     path="/admin/logout",
  *     summary="Déconnexion administrateur",
  *     description="Déconnexion de l'administrateur connecté",
  *     operationId="adminLogout",
@@ -72,7 +73,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Get(
- *     path="/v1/admin/user",
+ *     path="/admin/user",
  *     summary="Informations de l'administrateur connecté",
  *     description="Récupère les informations de l'administrateur actuellement connecté",
  *     operationId="getAdminUser",
@@ -95,9 +96,9 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Post(
- *     path="/v1/admin/clients",
+ *     path="/admin/clients",
  *     summary="Créer un client et son compte",
- *     description="Crée un nouveau client avec son compte associé",
+ *     description="Crée un nouveau client avec son compte associé. Remarque : l'admin doit être authentifié (access_token) et posséder un refresh_token obtenu via /v1/admin/login avant d'appeler cette route.",
  *     operationId="createClient",
  *     tags={"Administration"},
  *     security={{"bearerAuth": {}}},
