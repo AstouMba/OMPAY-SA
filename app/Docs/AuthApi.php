@@ -9,7 +9,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Post(
- *     path="/v1/client/send-otp",
+ *     path="/client/send-otp",
  *     summary="Envoyer un code OTP",
  *     description="Envoie un code OTP au numéro de téléphone du client pour l'authentification",
  *     operationId="sendOtp",
@@ -51,7 +51,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Post(
- *     path="/v1/client/verify-otp",
+ *     path="/client/verify-otp",
  *     summary="Vérifier le code OTP",
  *     description="Vérifie le code OTP et connecte le client si valide",
  *     operationId="verifyOtp",
@@ -91,7 +91,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Post(
- *     path="/v1/client/logout",
+ *     path="/client/logout",
  *     summary="Déconnexion client",
  *     description="Déconnecte le client actuellement connecté",
  *     operationId="clientLogout",
@@ -114,7 +114,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Get(
- *     path="/v1/client/user",
+ *     path="/client/user",
  *     summary="Informations du client connecté",
  *     description="Récupère les informations du client actuellement connecté avec ses comptes",
  *     operationId="getClientUser",
@@ -136,61 +136,7 @@ use OpenApi\Annotations as OA;
  *     )
  * )
  *
- * @OA\Get(
- *     path="/v1/client/solde",
- *     summary="Consulter le solde",
- *     description="Récupère le solde de tous les comptes du client connecté",
- *     operationId="getClientSolde",
- *     tags={"Authentification Client"},
- *     security={{"bearerAuth": {}}},
- *     @OA\Response(
- *         response=200,
- *         description="Solde récupéré avec succès",
- *         @OA\JsonContent(ref="#/components/schemas/SoldeResponse")
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Non authentifié",
- *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
- *     )
- * )
- *
- * @OA\Get(
- *     path="/v1/client/transactions",
- *     summary="Historique des transactions",
- *     description="Récupère l'historique des transactions du client connecté",
- *     operationId="getClientTransactions",
- *     tags={"Authentification Client"},
- *     security={{"bearerAuth": {}}},
- *     @OA\Parameter(
- *         name="page",
- *         in="query",
- *         description="Numéro de page",
- *         required=false,
- *         @OA\Schema(type="integer", default=1)
- *     ),
- *     @OA\Parameter(
- *         name="per_page",
- *         in="query",
- *         description="Nombre d'éléments par page",
- *         required=false,
- *         @OA\Schema(type="integer", default=15)
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Transactions récupérées",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="success", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="liste des transactions recupérée avec succés"),
- *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Transaction"))
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Non authentifié",
- *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
- *     )
- * )
+ 
+
  */
 class AuthApi{}

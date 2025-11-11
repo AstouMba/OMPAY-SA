@@ -20,7 +20,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Server(
- *     url="https://ompay-api.onrender.com/api/v1",
+ *     url="https://ompay-sa.onrender.com/api/v1",
  *     description="Serveur de production"
  * )
  *
@@ -32,39 +32,13 @@ use OpenApi\Annotations as OA;
  *     description="Token JWT obtenu via l'authentification admin ou client"
  * )
  *
- * @OA\Tag(
- *     name="Health Check",
- *     description="Vérification de l'état de l'API"
- * )
- *
- * @OA\Get(
- *     path="/health",
- *     summary="Vérification de santé",
- *     description="Endpoint pour vérifier que l'API fonctionne correctement",
- *     operationId="healthCheck",
- *     tags={"Health Check"},
- *     @OA\Response(
- *         response=200,
- *         description="API opérationnelle",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="status", type="string", example="ok"),
- *             @OA\Property(property="timestamp", type="string", format="date-time")
- *         )
- *     )
- * )
+ // Health check removed from documentation as requested
  *
  * @OA\PathItem(
  *     path="/user"
  * )
  *
- * @OA\PathItem(
- *     path="/v1/solde"
- * )
- *
- * @OA\PathItem(
- *     path="/v1/transactions"
- * )
+ 
  *
  * @OA\PathItem(
  *     path="/v1/admin/clients"
