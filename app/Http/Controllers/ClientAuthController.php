@@ -7,9 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Client;
 use App\Services\OtpService;
-use App\Services\CompteService;
 use App\Services\TransactionService;
-use App\Services\QrCodeService;
 use App\Traits\ApiResponses;
 use App\Http\Requests\SendOtpRequest;
 use App\Http\Requests\VerifyOtpRequest;
@@ -19,20 +17,14 @@ class ClientAuthController extends Controller
     use ApiResponses;
 
     protected $otpService;
-    protected $compteService;
     protected $transactionService;
-    protected $qrCodeService;
 
     public function __construct(
         OtpService $otpService,
-        CompteService $compteService,
-        TransactionService $transactionService,
-        QrCodeService $qrCodeService
+        TransactionService $transactionService
     ) {
         $this->otpService = $otpService;
-        $this->compteService = $compteService;
         $this->transactionService = $transactionService;
-        $this->qrCodeService = $qrCodeService;
     }
 
     /**
@@ -79,22 +71,11 @@ class ClientAuthController extends Controller
         // Create access token for client
         $token = $client->createToken('ClientToken');
 
-        // Fetch additional data for dashboard
-        $solde = $this->compteService->getSoldeForClient();
-        $qrCode = $this->qrCodeService->generateClientQrCode($client);
-        $transactions = $this->transactionService->getTransactionsForAuthenticatedClient($client->id, [], 10)->items();
-
-        // Enrichir les transactions avec les informations des destinataires
-        $transactions = $this->enrichirTransactionsAvecDestinataires($transactions);
-
         return $this->successResponse([
             'client' => $client->load('comptes'),
             'access_token' => $token->accessToken,
             'refresh_token' => $token->token->id, // Laravel Passport refresh token
             'token_type' => 'Bearer',
-            'solde' => $solde,
-            'qr_code' => $qrCode,
-            'transactions' => $transactions,
         ], MessageEnumFr::LOGIN_REUSSI);
     }
 
@@ -108,67 +89,5 @@ class ClientAuthController extends Controller
         return $this->successResponse(null, MessageEnumFr::LOGOUT_REUSSI);
     }
 
-    /**
-     * Get authenticated client
-     */
-    public function user(Request $request)
-    {
-        return $this->successResponse($request->user()->load('comptes'));
-    }
 
-    /**
-     * Enrichir les transactions avec les informations des destinataires
-     */
-    public function enrichirTransactionsAvecDestinataires($transactions)
-    {
-        // Convertir les objets Eloquent en arrays
-        $transactionsArray = array_map(function ($transaction) {
-            return $transaction->toArray();
-        }, $transactions);
-
-        return array_map(function ($transaction) {
-            $destinataire = null;
-
-            switch ($transaction['type']) {
-                case 'paiement_marchand':
-                    if (isset($transaction['marchand']) && $transaction['marchand']) {
-                        $destinataire = [
-                            'type' => 'marchand',
-                            'nom' => $transaction['marchand']['nom'],
-                            'telephone' => $transaction['marchand']['telephone'] ?? $transaction['telephone_marchand']
-                        ];
-                    }
-                    break;
-
-                case 'transfert_debit':
-                    // Pour les transferts sortants, chercher le client destinataire
-                    // Note: Dans une vraie implémentation, il faudrait un champ client_destinataire_id
-                    // Pour l'instant, on utilise une logique simplifiée
-                    $destinataire = [
-                        'type' => 'client',
-                        'nom' => 'Client destinataire', // À remplacer par la vraie logique
-                        'telephone' => 'N/A'
-                    ];
-                    break;
-
-                case 'transfert_credit':
-                    // Pour les transferts entrants, c'est l'expéditeur
-                    $destinataire = [
-                        'type' => 'client',
-                        'nom' => 'Client expéditeur', // À remplacer par la vraie logique
-                        'telephone' => 'N/A'
-                    ];
-                    break;
-
-                default:
-                    $destinataire = null;
-                    break;
-            }
-
-            // Ajouter les informations du destinataire à la transaction
-            $transaction['destinataire'] = $destinataire;
-
-            return $transaction;
-        }, $transactionsArray);
-    }
 }

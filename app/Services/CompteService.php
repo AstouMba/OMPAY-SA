@@ -57,4 +57,22 @@ class CompteService
             'date_mise_a_jour' => $dateMiseAJour
         ];
     }
+
+    public function getActiveAccountForClient($clientId)
+    {
+        // Assuming the first account is active, or add logic for active status
+        return $this->compteRepository->getComptesByClient($clientId)->first();
+    }
+
+    public function debitAccount(Compte $compte, $amount)
+    {
+        // Check balance
+        $currentSolde = $compte->solde();
+        if ($currentSolde < $amount) {
+            throw new \Exception('Solde insuffisant');
+        }
+
+        // The debit will be recorded in transaction, balance calculated dynamically
+        return $currentSolde - $amount;
+    }
 }

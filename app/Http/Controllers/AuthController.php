@@ -54,11 +54,4 @@ class AuthController extends Controller
         return $this->successResponse(null, MessageEnumFr::LOGOUT_REUSSI);
     }
 
-    /**
-     * Get authenticated user
-     */
-    public function user(Request $request)
-    {
-        return $this->successResponse($request->user());
-    }
 }
