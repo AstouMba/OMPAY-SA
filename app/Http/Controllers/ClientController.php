@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Traits\ApiResponses;
 use App\Http\Resources\ClientQrResource;
 use App\Services\QrCodeService;
