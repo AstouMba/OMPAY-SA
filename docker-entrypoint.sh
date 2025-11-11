@@ -38,10 +38,15 @@ done
 
 echo "Database is up - executing runtime init steps"
 
+# Install dependencies
+echo "Installing Composer dependencies..."
+composer install --no-dev --optimize-autoloader
+
 # Clear caches
-php artisan route:clear || true
 php artisan config:clear || true
+php artisan route:clear || true
 php artisan cache:clear || true
+php artisan view:clear || true
 
 echo "Ensuring storage directories exist..."
 mkdir -p storage/api-docs
@@ -56,7 +61,7 @@ echo "Fixing permissions..."
 chmod -R 775 storage bootstrap/cache
 
 echo "Generating Swagger documentation..."
-php artisan l5-swagger:generate  || echo "⚠ Swagger generation failed (continuing)"
+php artisan l5-swagger:generate --force || echo "⚠ Swagger generation failed (continuing)"
 
 if [ -f "storage/api-docs/api-docs.json" ]; then
   echo "✓ Swagger generated successfully"
@@ -67,6 +72,7 @@ fi
 echo "Running migrations..."
 php artisan migrate --force || true
 
+echo "Caching config..."
 php artisan config:cache || true
 
 echo "Starting Laravel app..."
