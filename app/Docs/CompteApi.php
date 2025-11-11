@@ -11,11 +11,11 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\PathItem(
- *     path="/v1/solde"
+ *     path="/solde"
  * )
  *
  * @OA\Get(
- *     path="/v1/solde",
+ *     path="/solde",
  *     summary="Obtenir le solde du compte",
  *     description="Récupère le solde actuel du compte du client connecté",
  *     operationId="getSolde",
