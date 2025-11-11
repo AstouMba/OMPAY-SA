@@ -49,13 +49,14 @@ mkdir -p storage/framework/{cache,data,sessions,testing,views}
 mkdir -p storage/logs
 mkdir -p bootstrap/cache
 
-#  FIX: Change owner to laravel (not www-data)
+echo "Creating storage symlink..."
+php artisan storage:link || true
+
 echo "Fixing permissions..."
 chmod -R 775 storage bootstrap/cache
 
-# Generate Swagger docs
 echo "Generating Swagger documentation..."
-php artisan l5-swagger:generate || echo "⚠ Swagger generation failed (continuing)"
+php artisan l5-swagger:generate --force || echo "⚠ Swagger generation failed (continuing)"
 
 if [ -f "storage/api-docs/api-docs.json" ]; then
   echo "✓ Swagger generated successfully"
@@ -63,7 +64,6 @@ else
   echo "⚠ Swagger file missing"
 fi
 
-# Migrate database
 echo "Running migrations..."
 php artisan migrate --force || true
 
