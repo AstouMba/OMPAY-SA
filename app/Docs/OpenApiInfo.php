@@ -32,13 +32,12 @@ use OpenApi\Annotations as OA;
  *     description="Token JWT obtenu via l'authentification admin ou client"
  * )
  *
- // Health check removed from documentation as requested
  *
  * @OA\PathItem(
  *     path="/user"
  * )
  *
- 
+
  *
  * @OA\PathItem(
  *     path="/v1/admin/clients"

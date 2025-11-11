@@ -1660,9 +1660,9 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "scheme": "bearer",
+                "description": "Token JWT obtenu via l'authentification admin ou client",
                 "bearerFormat": "JWT",
-                "description": "Token JWT obtenu via l'authentification admin ou client"
+                "scheme": "bearer"
             }
         }
     },
@@ -1678,11 +1678,6 @@
         {
             "name": "Transactions",
             "description": "Opérations liées aux transactions"
-        }
-    ],
-    "security": [
-        {
-            "bearerAuth": []
         }
     ]
 }
