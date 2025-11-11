@@ -83,28 +83,20 @@ return [
 
         'securityDefinitions' => [
             'securitySchemes' => [
-                'passport' => [
-                    'type' => 'oauth2',
-                    'description' => 'Laravel Passport OAuth2',
-                    'flows' => [
-                        'password' => [
-                            'authorizationUrl' => env('APP_URL') . '/oauth/authorize',
-                            'tokenUrl' => env('APP_URL') . '/oauth/token',
-                            'refreshUrl' => env('APP_URL') . '/oauth/token/refresh',
-                            'scopes' => [
-                                '*' => 'All scopes',
-                            ],
-                        ],
-                    ],
+                'bearerAuth' => [
+                    'type' => 'http',
+                    'scheme' => 'bearer',
+                    'bearerFormat' => 'JWT',
+                    'description' => 'Token JWT obtenu via l\'authentification admin ou client',
                 ],
             ],
             'security' => [
-                ['passport' => ['*']],
+                ['bearerAuth' => []],
             ],
         ],
 
-        // ✅ Force regen sur chaque déploiement → évite 404
-        'generate_always' => true,
+        // Désactiver la régénération automatique en prod
+        'generate_always' => env('APP_ENV') === 'local',
 
         'generate_yaml_copy' => false,
         'proxy' => null,
