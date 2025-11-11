@@ -56,7 +56,7 @@ echo "Fixing permissions..."
 chmod -R 775 storage bootstrap/cache
 
 echo "Generating Swagger documentation..."
-php artisan l5-swagger:generate --force || echo "⚠ Swagger generation failed (continuing)"
+php artisan l5-swagger:generate  || echo "⚠ Swagger generation failed (continuing)"
 
 if [ -f "storage/api-docs/api-docs.json" ]; then
   echo "✓ Swagger generated successfully"
