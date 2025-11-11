@@ -10,12 +10,14 @@ class ClientSeeder extends Seeder
 {
     public function run(): void
     {
-        Client::create([
-            'id' => Str::uuid(),
-            'nom' => 'Astou',
-            'prenom' => 'Mbow',
-            'telephone' => '+221771234567',
-            'nci' => '2234567890123',
-        ]);
+        Client::firstOrCreate(
+            ['telephone' => '+221781157773'],
+            [
+                'id' => Str::uuid(),
+                'nom' => 'Astou',
+                'prenom' => 'Mbow',
+                'nci' => '2234567890123',
+            ]
+        );
     }
 }

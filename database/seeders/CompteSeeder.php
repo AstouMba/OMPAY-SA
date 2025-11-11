@@ -14,17 +14,20 @@ class CompteSeeder extends Seeder
      */
     public function run(): void
     {
-        $client = Client::first();
+        $client = Client::where('telephone', '+221781157773')->first();
 
         if ($client) {
-            Compte::create([
-                'id' => Str::uuid(),
-                'client_id' => $client->id,
-                'numero_compte' => '+221771234567',
-                'type_compte' => 'ompay',
-                'devise' => 'FCFA',
-                'est_supprime' => false,
-            ]);
+            Compte::firstOrCreate(
+                ['numero_compte' => '+221781157773'],
+                [
+                    'id' => Str::uuid(),
+                    'client_id' => $client->id,
+                    'type_compte' => 'ompay',
+                    'devise' => 'FCFA',
+                    'solde' => 100000,
+                    'est_supprime' => false,
+                ]
+            );
         }
     }
 }

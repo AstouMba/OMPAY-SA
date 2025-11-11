@@ -18,7 +18,7 @@ use OpenApi\Annotations as OA;
  *         required=true,
  *         @OA\JsonContent(
  *             required={"telephone"},
- *             @OA\Property(property="telephone", type="string", example="+221771234567", description="Numéro de téléphone sénégalais (format: +221XXXXXXXXX)")
+ *             @OA\Property(property="telephone", type="string", example="+221781157773", description="Numéro de téléphone sénégalais (format: +221XXXXXXXXX)")
  *         )
  *     ),
  *     @OA\Response(
@@ -60,7 +60,7 @@ use OpenApi\Annotations as OA;
  *         required=true,
  *         @OA\JsonContent(
  *             required={"telephone", "otp"},
- *             @OA\Property(property="telephone", type="string", example="+221771234567", description="Numéro de téléphone sénégalais"),
+ *             @OA\Property(property="telephone", type="string", example="+221781157773", description="Numéro de téléphone sénégalais"),
  *             @OA\Property(property="otp", type="string", minLength=6, maxLength=6, example="123456", description="Code OTP à 6 chiffres")
  *         )
  *     ),

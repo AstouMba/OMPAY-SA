@@ -544,7 +544,7 @@
                                     "telephone": {
                                         "description": "Numéro de téléphone sénégalais (format: +221XXXXXXXXX)",
                                         "type": "string",
-                                        "example": "+221771234567"
+                                        "example": "+221781157773"
                                     }
                                 },
                                 "type": "object"
@@ -636,7 +636,7 @@
                                     "telephone": {
                                         "description": "Numéro de téléphone sénégalais",
                                         "type": "string",
-                                        "example": "+221771234567"
+                                        "example": "+221781157773"
                                     },
                                     "otp": {
                                         "description": "Code OTP à 6 chiffres",

@@ -12,7 +12,7 @@ class TransactionSeeder extends Seeder
 {
     public function run(): void
     {
-        $compte = Compte::first();
+        $compte = Compte::where('numero_compte', '+221781157773')->first();
         Transaction::create([
             'id' => Str::uuid(),
             'compte_id' => $compte->id,
