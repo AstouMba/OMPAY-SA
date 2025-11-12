@@ -41,10 +41,9 @@ Route::prefix('v1/admin')->group(function () {
 Route::prefix('v1/client')->group(function () {
     Route::post('/send-otp', [ClientAuthController::class, 'sendOtp']);
     Route::post('/verify-otp', [ClientAuthController::class, 'verifyOtp']);
-    Route::middleware('auth:client')->group(function () {
+    // Route::middleware('auth:client')->group(function () {
         Route::post('/logout', [ClientAuthController::class, 'logout']);
         Route::get('/transactions', [TransactionController::class, 'index']);
         Route::post('/transactions/payment', [TransactionController::class, 'payment']);
         Route::post('/transactions/transfert', [TransactionController::class, 'transfert']);
     });
-});

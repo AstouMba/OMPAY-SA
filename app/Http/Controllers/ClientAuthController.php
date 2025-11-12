@@ -8,9 +8,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Client;
 use App\Services\OtpService;
 use App\Services\TransactionService;
+use App\Services\QrCodeService;
 use App\Traits\ApiResponses;
 use App\Http\Requests\SendOtpRequest;
 use App\Http\Requests\VerifyOtpRequest;
+use App\Http\Resources\ClientResource;
+use App\Http\Resources\ClientQrResource;
 
 class ClientAuthController extends Controller
 {
@@ -18,13 +21,16 @@ class ClientAuthController extends Controller
 
     protected $otpService;
     protected $transactionService;
+    protected $qrCodeService;
 
     public function __construct(
         OtpService $otpService,
-        TransactionService $transactionService
+        TransactionService $transactionService,
+        QrCodeService $qrCodeService
     ) {
         $this->otpService = $otpService;
         $this->transactionService = $transactionService;
+        $this->qrCodeService = $qrCodeService;
     }
 
     /**
@@ -70,8 +76,12 @@ class ClientAuthController extends Controller
         // Create access token for client
         $token = $client->createToken('ClientToken');
 
+        // Generate QR code
+        $qrCodeData = $this->qrCodeService->generateClientQrCode($client);
+
         return $this->successResponse([
-            'client' => $client->load('comptes'),
+            'client' => new ClientResource($client->load('comptes')),
+            'qr_code' => new ClientQrResource($qrCodeData),
             'access_token' => $token->accessToken,
             'refresh_token' => $token->token->id, // Laravel Passport refresh token
             'token_type' => 'Bearer',
