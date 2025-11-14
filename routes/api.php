@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminClientController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientAuthController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\SoldeController;
 use App\Http\Controllers\TransactionFeeController;
 
 /*
@@ -43,11 +44,13 @@ Route::prefix('v1/client')->group(function () {
     Route::post('/send-otp', [ClientAuthController::class, 'sendOtpActivation']);
     Route::post('/login', [ClientAuthController::class, 'login']);
     Route::post('/verify-otp', [ClientAuthController::class, 'verifyOtpNew']);
-    Route::middleware('auth:api')->group(function () {
-        Route::get('/client', [ClientController::class, 'show']);
-        Route::post('/logout', [ClientAuthController::class, 'logout']);
-        Route::get('/transactions', [TransactionController::class, 'index']);
-        Route::post('/transactions/payment', [TransactionController::class, 'payment']);
-        Route::post('/transactions/transfert', [TransactionController::class, 'transfert']);
+    Route::middleware('auth:client')->group(function () {
+        Route::get('/compte', [ClientController::class, 'compte'])->name('client.compte');
+        Route::get('/{numero}/solde', [SoldeController::class, 'show'])->name('client.solde');
+        Route::post('/logout', [ClientAuthController::class, 'logout'])->name('client.logout');
+        Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+        Route::post('/transactions/payment', [TransactionController::class, 'payment'])->name('transactions.payment');
+        Route::post('/transactions/transfert', [TransactionController::class, 'transfert'])->name('transactions.transfert');
     });
 });
+

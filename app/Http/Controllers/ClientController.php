@@ -23,7 +23,7 @@ class ClientController extends Controller
     /**
      * Get authenticated client profile with account, transactions and QR code
      */
-    public function show(Request $request)
+    public function compte(Request $request)
     {
         $client = Auth::user();
 

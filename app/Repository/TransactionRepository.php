@@ -52,7 +52,9 @@ class TransactionRepository
             ->join('comptes', 'transactions.compte_id', '=', 'comptes.id')
             ->where('comptes.client_id', $clientId)
             ->select('transactions.*')
-            ->with('marchand') // Charger la relation marchand
+            ->with(['marchand' => function($q) {
+                $q->select('id', 'nom', 'code_marchand', 'telephone');
+            }]) // Charger la relation marchand avec sélection limitée
             ->orderBy('transactions.created_at', 'desc');
 
         // Appliquer les filtres de date

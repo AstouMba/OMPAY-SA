@@ -61,7 +61,7 @@ use OpenApi\Annotations as OA;
  *         required=true,
  *         @OA\JsonContent(
  *             required={"telephone"},
- *             @OA\Property(property="telephone", type="string", example="771234568", description="Numéro de téléphone du client")
+ *             @OA\Property(property="telephone", type="string", example="+221781157773", description="Numéro de téléphone du client")
  *         )
  *     ),
  *     @OA\Response(
@@ -94,7 +94,7 @@ use OpenApi\Annotations as OA;
  *         required=true,
  *         @OA\JsonContent(
  *             required={"telephone", "otp"},
- *             @OA\Property(property="telephone", type="string", example="771234568", description="Numéro de téléphone du client"),
+ *             @OA\Property(property="telephone", type="string", example="+221781157773", description="Numéro de téléphone du client"),
  *             @OA\Property(property="otp", type="string", example="482913", description="Code OTP à 6 chiffres")
  *         )
  *     ),
@@ -120,7 +120,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Get(
- *     path="/client",
+ *     path="/client/compte",
  *     summary="Récupérer le profil client",
  *     description="Récupère les informations du client connecté, son compte, ses transactions et son QR code",
  *     operationId="getClientProfile",
@@ -138,19 +138,19 @@ use OpenApi\Annotations as OA;
  *                     @OA\Property(property="id", type="string", example="uuid-client"),
  *                     @OA\Property(property="nom", type="string", example="Diallo"),
  *                     @OA\Property(property="prenom", type="string", example="Moussa"),
- *                     @OA\Property(property="telephone", type="string", example="771234568"),
+ *                     @OA\Property(property="telephone", type="string", example="+221781157773"),
  *                     @OA\Property(property="nci", type="string", example="1234567890123"),
  *                     @OA\Property(property="statut", type="string", example="actif")
  *                 ),
  *                 @OA\Property(property="compte", type="object",
- *                     @OA\Property(property="numero_compte", type="string", example="771234568"),
+ *                     @OA\Property(property="numero_compte", type="string", example="+221781157773"),
  *                     @OA\Property(property="solde", type="integer", example=12500),
  *                     @OA\Property(property="statut", type="string", example="actif")
  *                 ),
  *                 @OA\Property(property="transactions", type="array",
  *                     @OA\Items(type="object",
  *                         @OA\Property(property="type", type="string", example="transfert", enum={"transfert", "reception", "retrait", "paiement"}),
- *                         @OA\Property(property="telephone", type="string", example="771234569"),
+ *                         @OA\Property(property="telephone", type="string", example="+221781157774"),
  *                         @OA\Property(property="montant", type="integer", example=-3000),
  *                         @OA\Property(property="date_transaction", type="string", format="date-time", example="2025-11-12T10:35:42Z")
  *                     )
@@ -167,6 +167,52 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(
  *         response=404,
  *         description="Aucun compte trouvé",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     )
+ * )
+ *
+ * @OA\Get(
+ *     path="/client/{numero}/solde",
+ *     summary="Récupérer le solde d'un compte",
+ *     description="Récupère le solde actuel d'un compte spécifique appartenant au client connecté",
+ *     operationId="getAccountBalance",
+ *     tags={"Client"},
+ *     security={{"bearerAuth": {}}},
+ *     @OA\Parameter(
+ *         name="numero",
+ *         in="path",
+ *         required=true,
+ *         description="Numéro du compte",
+ *         @OA\Schema(type="string", example="+221781157773")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Solde récupéré avec succès",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="status", type="string", example="success"),
+ *             @OA\Property(property="message", type="string", example="Solde récupéré avec succès"),
+ *             @OA\Property(property="data", type="object",
+ *                 @OA\Property(property="compte_id", type="string", format="uuid", example="uuid-compte"),
+ *                 @OA\Property(property="numero_compte", type="string", example="+221781157773"),
+ *                 @OA\Property(property="solde", type="integer", example=12500),
+ *                 @OA\Property(property="devise", type="string", example="XOF")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Client non authentifié",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Compte non trouvé ou accès non autorisé",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Compte inactif",
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )

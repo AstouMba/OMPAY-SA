@@ -25,6 +25,7 @@ class CompteSeeder extends Seeder
                     'type_compte' => 'ompay',
                     'devise' => 'FCFA',
                     'solde' => 100000,
+                    'statut' => 'actif',
                     'est_supprime' => false,
                 ]
             );

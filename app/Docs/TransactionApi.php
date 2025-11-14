@@ -69,7 +69,7 @@ use OpenApi\Annotations as OA;
  *         @OA\JsonContent(
  *             type="object",
  *             @OA\Property(property="code_marchand", type="string", example="M123456", description="Code du marchand"),
- *             @OA\Property(property="numero_marchand", type="string", example="771234567", description="Numéro de téléphone du marchand"),
+ *             @OA\Property(property="numero_marchand", type="string", example="+221781157773", description="Numéro de téléphone du marchand"),
  *             @OA\Property(property="montant", type="integer", example=5000, description="Montant du paiement")
  *         )
  *     ),
@@ -126,7 +126,7 @@ use OpenApi\Annotations as OA;
  *         required=true,
  *         @OA\JsonContent(
  *             type="object",
- *             @OA\Property(property="numero_ompay", type="string", example="771234568", description="Numéro OMPay du destinataire"),
+ *             @OA\Property(property="numero_ompay", type="string", example="+221781157773", description="Numéro OMPay du destinataire"),
  *             @OA\Property(property="montant", type="integer", example=3000, description="Montant du transfert")
  *         )
  *     ),
@@ -143,11 +143,11 @@ use OpenApi\Annotations as OA;
  *                 @OA\Property(property="montant", type="integer", example=3000),
  *                 @OA\Property(property="frais", type="integer", example=24),
  *                 @OA\Property(property="emetteur", type="object",
- *                     @OA\Property(property="numero_ompay", type="string", example="771234567"),
+ *                     @OA\Property(property="numero_ompay", type="string", example="+221781157772"),
  *                     @OA\Property(property="solde_apres", type="integer", example=92024)
  *                 ),
  *                 @OA\Property(property="destinataire", type="object",
- *                     @OA\Property(property="numero_ompay", type="string", example="771234568"),
+ *                     @OA\Property(property="numero_ompay", type="string", example="+221781157773"),
  *                     @OA\Property(property="nom_prenom", type="string", example="Moussa Diallo"),
  *                     @OA\Property(property="montant_recu", type="integer", example=3000)
  *                 ),

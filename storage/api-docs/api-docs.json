@@ -635,7 +635,7 @@
                                     "telephone": {
                                         "description": "Numéro de téléphone du client",
                                         "type": "string",
-                                        "example": "771234568"
+                                        "example": "+221781157773"
                                     }
                                 },
                                 "type": "object"
@@ -708,7 +708,7 @@
                                     "telephone": {
                                         "description": "Numéro de téléphone du client",
                                         "type": "string",
-                                        "example": "771234568"
+                                        "example": "+221781157773"
                                     },
                                     "otp": {
                                         "description": "Code OTP à 6 chiffres",
@@ -772,7 +772,7 @@
                 }
             }
         },
-        "/client": {
+        "/client/compte": {
             "get": {
                 "tags": [
                     "Client"
@@ -813,7 +813,7 @@
                                                         },
                                                         "telephone": {
                                                             "type": "string",
-                                                            "example": "771234568"
+                                                            "example": "+221781157773"
                                                         },
                                                         "nci": {
                                                             "type": "string",
@@ -830,7 +830,7 @@
                                                     "properties": {
                                                         "numero_compte": {
                                                             "type": "string",
-                                                            "example": "771234568"
+                                                            "example": "+221781157773"
                                                         },
                                                         "solde": {
                                                             "type": "integer",
@@ -859,7 +859,7 @@
                                                             },
                                                             "telephone": {
                                                                 "type": "string",
-                                                                "example": "771234569"
+                                                                "example": "+221781157774"
                                                             },
                                                             "montant": {
                                                                 "type": "integer",
@@ -899,6 +899,107 @@
                     },
                     "404": {
                         "description": "Aucun compte trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/client/{numero}/solde": {
+            "get": {
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Récupérer le solde d'un compte",
+                "description": "Récupère le solde actuel d'un compte spécifique appartenant au client connecté",
+                "operationId": "getAccountBalance",
+                "parameters": [
+                    {
+                        "name": "numero",
+                        "in": "path",
+                        "description": "Numéro du compte",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "+221781157773"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Solde récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Solde récupéré avec succès"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "compte_id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "uuid-compte"
+                                                },
+                                                "numero_compte": {
+                                                    "type": "string",
+                                                    "example": "+221781157773"
+                                                },
+                                                "solde": {
+                                                    "type": "integer",
+                                                    "example": 12500
+                                                },
+                                                "devise": {
+                                                    "type": "string",
+                                                    "example": "XOF"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Client non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Compte non trouvé ou accès non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Compte inactif",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1079,7 +1180,7 @@
                                     "numero_marchand": {
                                         "description": "Numéro de téléphone du marchand",
                                         "type": "string",
-                                        "example": "771234567"
+                                        "example": "+221781157773"
                                     },
                                     "montant": {
                                         "description": "Montant du paiement",
@@ -1218,7 +1319,7 @@
                                     "numero_ompay": {
                                         "description": "Numéro OMPay du destinataire",
                                         "type": "string",
-                                        "example": "771234568"
+                                        "example": "+221781157773"
                                     },
                                     "montant": {
                                         "description": "Montant du transfert",
@@ -1268,7 +1369,7 @@
                                                     "properties": {
                                                         "numero_ompay": {
                                                             "type": "string",
-                                                            "example": "771234567"
+                                                            "example": "+221781157772"
                                                         },
                                                         "solde_apres": {
                                                             "type": "integer",
@@ -1281,7 +1382,7 @@
                                                     "properties": {
                                                         "numero_ompay": {
                                                             "type": "string",
-                                                            "example": "771234568"
+                                                            "example": "+221781157773"
                                                         },
                                                         "nom_prenom": {
                                                             "type": "string",
