@@ -24,9 +24,18 @@ class AdminClientController extends Controller
         try {
             $result = $this->adminClientService->createClientAndAccount($request->validated());
 
+            $client = $result['client'];
+            $compte = $result['compte'];
+
             return $this->successResponse([
-                'client' => $result['client'],
-                'compte' => $result['compte'],
+                'client' => [
+                    'id' => $client->id,
+                    'nom' => $client->nom,
+                    'prenom' => $client->prenom,
+                    'telephone' => $client->telephone,
+                    'nci' => $client->nci,
+                    'statut' => $compte->statut,
+                ],
             ], MessageEnumFr::CLIENT_COMPTE_CREE);
 
         } catch (\Exception $e) {

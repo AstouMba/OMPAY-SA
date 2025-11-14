@@ -26,7 +26,7 @@ return [
 
     'services' => [
         'sms' => [
-            'enabled' => true,
+            'enabled' => env('OTP_SEND_SMS', true),
         ],
     ],
 ];

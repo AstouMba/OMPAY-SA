@@ -615,14 +615,86 @@
                 }
             }
         },
+        "/client/login": {
+            "post": {
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Envoyer OTP pour connexion",
+                "description": "Envoie un code OTP au client actif pour se connecter",
+                "operationId": "clientLogin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "telephone"
+                                ],
+                                "properties": {
+                                    "telephone": {
+                                        "description": "Numéro de téléphone du client",
+                                        "type": "string",
+                                        "example": "771234568"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP envoyé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Code OTP envoyé avec succès"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Client non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Compte non activé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/client/verify-otp": {
             "post": {
                 "tags": [
-                    "Authentification Client"
+                    "Client"
                 ],
-                "summary": "Vérifier le code OTP",
-                "description": "Vérifie le code OTP et connecte le client si valide",
-                "operationId": "verifyOtp",
+                "summary": "Vérifier OTP et authentifier",
+                "description": "Vérifie le code OTP et active le compte ou connecte le client selon le type",
+                "operationId": "verifyOtpNew",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -634,16 +706,14 @@
                                 ],
                                 "properties": {
                                     "telephone": {
-                                        "description": "Numéro de téléphone sénégalais",
+                                        "description": "Numéro de téléphone du client",
                                         "type": "string",
-                                        "example": "+221781157773"
+                                        "example": "771234568"
                                     },
                                     "otp": {
                                         "description": "Code OTP à 6 chiffres",
                                         "type": "string",
-                                        "maxLength": 6,
-                                        "minLength": 6,
-                                        "example": "123456"
+                                        "example": "482913"
                                     }
                                 },
                                 "type": "object"
@@ -668,11 +738,8 @@
                                         },
                                         "data": {
                                             "properties": {
-                                                "client": {
-                                                    "$ref": "#/components/schemas/Client"
-                                                },
                                                 "access_token": {
-                                                    "description": "Token d'accès",
+                                                    "description": "Token d'accès OAuth2",
                                                     "type": "string"
                                                 },
                                                 "refresh_token": {
@@ -682,44 +749,6 @@
                                                 "token_type": {
                                                     "type": "string",
                                                     "example": "Bearer"
-                                                },
-                                                "solde": {
-                                                    "properties": {
-                                                        "solde": {
-                                                            "description": "Solde du compte",
-                                                            "type": "number",
-                                                            "format": "float"
-                                                        },
-                                                        "devise": {
-                                                            "type": "string",
-                                                            "example": "FCFA"
-                                                        },
-                                                        "date_mise_a_jour": {
-                                                            "type": "string",
-                                                            "format": "date-time"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "qr_code": {
-                                                    "properties": {
-                                                        "numero_compte": {
-                                                            "description": "Numéro du compte",
-                                                            "type": "string"
-                                                        },
-                                                        "qr_code_base64": {
-                                                            "description": "QR code en base64",
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "transactions": {
-                                                    "description": "Dernières transactions (max 10)",
-                                                    "type": "array",
-                                                    "items": {
-                                                        "$ref": "#/components/schemas/Transaction"
-                                                    }
                                                 }
                                             },
                                             "type": "object"
@@ -731,17 +760,7 @@
                         }
                     },
                     "401": {
-                        "description": "Code OTP invalide ou expiré",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Client non trouvé",
+                        "description": "OTP invalide ou expiré",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -751,6 +770,149 @@
                         }
                     }
                 }
+            }
+        },
+        "/client": {
+            "get": {
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Récupérer le profil client",
+                "description": "Récupère les informations du client connecté, son compte, ses transactions et son QR code",
+                "operationId": "getClientProfile",
+                "responses": {
+                    "200": {
+                        "description": "Profil client récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profil client récupéré avec succès"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "client": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "example": "uuid-client"
+                                                        },
+                                                        "nom": {
+                                                            "type": "string",
+                                                            "example": "Diallo"
+                                                        },
+                                                        "prenom": {
+                                                            "type": "string",
+                                                            "example": "Moussa"
+                                                        },
+                                                        "telephone": {
+                                                            "type": "string",
+                                                            "example": "771234568"
+                                                        },
+                                                        "nci": {
+                                                            "type": "string",
+                                                            "example": "1234567890123"
+                                                        },
+                                                        "statut": {
+                                                            "type": "string",
+                                                            "example": "actif"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "compte": {
+                                                    "properties": {
+                                                        "numero_compte": {
+                                                            "type": "string",
+                                                            "example": "771234568"
+                                                        },
+                                                        "solde": {
+                                                            "type": "integer",
+                                                            "example": 12500
+                                                        },
+                                                        "statut": {
+                                                            "type": "string",
+                                                            "example": "actif"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "transactions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "transfert",
+                                                                    "reception",
+                                                                    "retrait",
+                                                                    "paiement"
+                                                                ],
+                                                                "example": "transfert"
+                                                            },
+                                                            "telephone": {
+                                                                "type": "string",
+                                                                "example": "771234569"
+                                                            },
+                                                            "montant": {
+                                                                "type": "integer",
+                                                                "example": -3000
+                                                            },
+                                                            "date_transaction": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2025-11-12T10:35:42Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "qrcode": {
+                                                    "type": "string",
+                                                    "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Client non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aucun compte trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/client/logout": {
@@ -1214,40 +1376,37 @@
                     "id": {
                         "description": "ID unique du client",
                         "type": "string",
-                        "format": "uuid"
+                        "format": "uuid",
+                        "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
                     },
                     "nom": {
                         "description": "Nom du client",
-                        "type": "string"
+                        "type": "string",
+                        "example": "string"
                     },
                     "prenom": {
                         "description": "Prénom du client",
-                        "type": "string"
+                        "type": "string",
+                        "example": "string"
                     },
                     "telephone": {
                         "description": "Numéro de téléphone",
-                        "type": "string"
+                        "type": "string",
+                        "example": "string"
                     },
                     "nci": {
                         "description": "Numéro de carte d'identité",
-                        "type": "string"
-                    },
-                    "date_creation": {
-                        "description": "Date de création",
                         "type": "string",
-                        "format": "date-time"
+                        "example": "string"
                     },
-                    "date_modification": {
-                        "description": "Date de mise à jour",
+                    "statut": {
+                        "description": "Statut du compte associé",
                         "type": "string",
-                        "format": "date-time"
-                    },
-                    "comptes": {
-                        "description": "Liste des comptes du client",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Compte"
-                        }
+                        "enum": [
+                            "actif",
+                            "inactif"
+                        ],
+                        "example": "inactif"
                     }
                 },
                 "type": "object"
@@ -1281,17 +1440,16 @@
                         "type": "number",
                         "format": "float"
                     },
-                    "est_supprime": {
-                        "description": "Statut de suppression",
-                        "type": "boolean"
+                    "statut": {
+                        "description": "Statut du compte",
+                        "type": "string",
+                        "enum": [
+                            "actif",
+                            "inactif"
+                        ]
                     },
                     "date_creation": {
                         "description": "Date de création",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "date_modification": {
-                        "description": "Date de mise à jour",
                         "type": "string",
                         "format": "date-time"
                     },
@@ -1354,11 +1512,6 @@
                         "description": "Date de création",
                         "type": "string",
                         "format": "date-time"
-                    },
-                    "date_modification": {
-                        "description": "Date de mise à jour",
-                        "type": "string",
-                        "format": "date-time"
                     }
                 },
                 "type": "object"
@@ -1386,11 +1539,6 @@
                     },
                     "date_creation": {
                         "description": "Date de création",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "date_modification": {
-                        "description": "Date de mise à jour",
                         "type": "string",
                         "format": "date-time"
                     }
@@ -1489,9 +1637,6 @@
                         "properties": {
                             "client": {
                                 "$ref": "#/components/schemas/Client"
-                            },
-                            "compte": {
-                                "$ref": "#/components/schemas/Compte"
                             }
                         },
                         "type": "object"
@@ -1532,11 +1677,6 @@
                     },
                     "created_at": {
                         "description": "Date de création",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updated_at": {
-                        "description": "Date de mise à jour",
                         "type": "string",
                         "format": "date-time"
                     }
@@ -1627,11 +1767,6 @@
                             "refresh_token": {
                                 "description": "Token de rafraîchissement (id du token, si applicable)",
                                 "type": "string"
-                            },
-                            "token_type": {
-                                "description": "Type de token",
-                                "type": "string",
-                                "example": "Bearer"
                             }
                         },
                         "type": "object"
@@ -1678,6 +1813,10 @@
         {
             "name": "Transactions",
             "description": "Opérations liées aux transactions"
+        },
+        {
+            "name": "Client",
+            "description": "Client"
         }
     ]
 }

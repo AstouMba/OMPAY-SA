@@ -21,6 +21,7 @@ class Compte extends Model
         'type_compte',
         'devise',
         'solde',
+        'statut',
         'est_supprime'
     ];
 

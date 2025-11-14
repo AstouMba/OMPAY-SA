@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Client;
+use App\Models\OtpVerification;
 use Illuminate\Support\Facades\Log;
 use Twilio\Rest\Client as TwilioClient;
 
@@ -31,13 +32,17 @@ class OtpService
             'otp_expires_at' => $expiresAt,
         ]);
 
-        // Send OTP via Twilio SMS
-        try {
-            $this->sendOtpSms($client->telephone, $otp);
-            Log::info("OTP sent successfully to client {$client->telephone}");
-        } catch (\Exception $e) {
-            Log::error("Failed to send OTP to {$client->telephone}: " . $e->getMessage());
-            // Continue execution - OTP is still stored in database
+        // Send OTP via Twilio SMS if enabled
+        if (config('twilio.services.sms.enabled')) {
+            try {
+                $this->sendOtpSms($client->telephone, $otp);
+                Log::info("OTP sent successfully to client {$client->telephone}");
+            } catch (\Exception $e) {
+                Log::error("Failed to send OTP to {$client->telephone}: " . $e->getMessage());
+                // Continue execution - OTP is still stored in database
+            }
+        } else {
+            Log::info("OTP SMS disabled - Code for {$client->telephone}: {$otp}");
         }
 
         return $otp;
@@ -120,5 +125,51 @@ class OtpService
     public function hasValidOtp(Client $client): bool
     {
         return $client->otp_code && $client->otp_expires_at > now();
+    }
+
+    /**
+     * Generate and send OTP for activation or login
+     */
+    public function generateAndSendOtp(string $telephone, string $type): string
+    {
+        $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        $expiresAt = now()->addMinutes(5);
+
+        OtpVerification::create([
+            'telephone' => $telephone,
+            'code' => $otp,
+            'type' => $type,
+            'expires_at' => $expiresAt,
+            'is_used' => false,
+        ]);
+
+        // Send OTP via SMS if enabled
+        if (config('twilio.services.sms.enabled')) {
+            try {
+                $this->sendOtpSms($telephone, $otp);
+                Log::info("OTP sent successfully to {$telephone} for {$type}");
+            } catch (\Exception $e) {
+                Log::error("Failed to send OTP to {$telephone}: " . $e->getMessage());
+            }
+        } else {
+            Log::info("OTP SMS disabled - Code for {$telephone} ({$type}): {$otp}");
+        }
+
+        return $otp;
+    }
+
+    /**
+     * Verify OTP and return the verification record
+     */
+    public function verifyOtpCode(string $telephone, string $otp): ?OtpVerification
+    {
+        $verification = OtpVerification::valid($telephone)->latest()->first();
+
+        if ($verification && $verification->code === $otp) {
+            $verification->update(['is_used' => true]);
+            return $verification;
+        }
+
+        return null;
     }
 }

@@ -50,18 +50,52 @@ use OpenApi\Annotations as OA;
  *     )
  * )
  *
+ * /**
+ * @OA\Post(
+ *     path="/client/login",
+ *     summary="Envoyer OTP pour connexion",
+ *     description="Envoie un code OTP au client actif pour se connecter",
+ *     operationId="clientLogin",
+ *     tags={"Client"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"telephone"},
+ *             @OA\Property(property="telephone", type="string", example="771234568", description="Numéro de téléphone du client")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="OTP envoyé avec succès",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Code OTP envoyé avec succès")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Client non trouvé",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Compte non activé",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     )
+ * )
  * @OA\Post(
  *     path="/client/verify-otp",
- *     summary="Vérifier le code OTP",
- *     description="Vérifie le code OTP et connecte le client si valide",
- *     operationId="verifyOtp",
- *     tags={"Authentification Client"},
+ *     summary="Vérifier OTP et authentifier",
+ *     description="Vérifie le code OTP et active le compte ou connecte le client selon le type",
+ *     operationId="verifyOtpNew",
+ *     tags={"Client"},
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(
  *             required={"telephone", "otp"},
- *             @OA\Property(property="telephone", type="string", example="+221781157773", description="Numéro de téléphone sénégalais"),
- *             @OA\Property(property="otp", type="string", minLength=6, maxLength=6, example="123456", description="Code OTP à 6 chiffres")
+ *             @OA\Property(property="telephone", type="string", example="771234568", description="Numéro de téléphone du client"),
+ *             @OA\Property(property="otp", type="string", example="482913", description="Code OTP à 6 chiffres")
  *         )
  *     ),
  *     @OA\Response(
@@ -72,9 +106,7 @@ use OpenApi\Annotations as OA;
  *             @OA\Property(property="success", type="boolean", example=true),
  *             @OA\Property(property="message", type="string", example="Connexion réussie"),
  *             @OA\Property(property="data", type="object",
- *                 @OA\Property(property="client", ref="#/components/schemas/Client"),
- *                 @OA\Property(property="qr_code", ref="#/components/schemas/ClientQrResponse"),
- *                 @OA\Property(property="access_token", type="string", description="Token d'accès"),
+ *                 @OA\Property(property="access_token", type="string", description="Token d'accès OAuth2"),
  *                 @OA\Property(property="refresh_token", type="string", description="Token de rafraîchissement"),
  *                 @OA\Property(property="token_type", type="string", example="Bearer")
  *             )
@@ -82,12 +114,59 @@ use OpenApi\Annotations as OA;
  *     ),
  *     @OA\Response(
  *         response=401,
- *         description="Code OTP invalide ou expiré",
+ *         description="OTP invalide ou expiré",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     )
+ * )
+ *
+ * @OA\Get(
+ *     path="/client",
+ *     summary="Récupérer le profil client",
+ *     description="Récupère les informations du client connecté, son compte, ses transactions et son QR code",
+ *     operationId="getClientProfile",
+ *     tags={"Client"},
+ *     security={{"bearerAuth": {}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Profil client récupéré avec succès",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Profil client récupéré avec succès"),
+ *             @OA\Property(property="data", type="object",
+ *                 @OA\Property(property="client", type="object",
+ *                     @OA\Property(property="id", type="string", example="uuid-client"),
+ *                     @OA\Property(property="nom", type="string", example="Diallo"),
+ *                     @OA\Property(property="prenom", type="string", example="Moussa"),
+ *                     @OA\Property(property="telephone", type="string", example="771234568"),
+ *                     @OA\Property(property="nci", type="string", example="1234567890123"),
+ *                     @OA\Property(property="statut", type="string", example="actif")
+ *                 ),
+ *                 @OA\Property(property="compte", type="object",
+ *                     @OA\Property(property="numero_compte", type="string", example="771234568"),
+ *                     @OA\Property(property="solde", type="integer", example=12500),
+ *                     @OA\Property(property="statut", type="string", example="actif")
+ *                 ),
+ *                 @OA\Property(property="transactions", type="array",
+ *                     @OA\Items(type="object",
+ *                         @OA\Property(property="type", type="string", example="transfert", enum={"transfert", "reception", "retrait", "paiement"}),
+ *                         @OA\Property(property="telephone", type="string", example="771234569"),
+ *                         @OA\Property(property="montant", type="integer", example=-3000),
+ *                         @OA\Property(property="date_transaction", type="string", format="date-time", example="2025-11-12T10:35:42Z")
+ *                     )
+ *                 ),
+ *                 @OA\Property(property="qrcode", type="string", example="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Client non authentifié",
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
  *     @OA\Response(
  *         response=404,
- *         description="Client non trouvé",
+ *         description="Aucun compte trouvé",
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )

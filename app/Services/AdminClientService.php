@@ -44,6 +44,8 @@ class AdminClientService
                 'numero_compte' => $data['telephone'],
                 'type_compte' => 'ompay',
                 'devise' => 'FCFA',
+                'solde' => 0,
+                'statut' => 'inactif',
                 'est_supprime' => false,
             ]);
 

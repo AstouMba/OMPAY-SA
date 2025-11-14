@@ -6,14 +6,12 @@ use App\Enums\MessageEnumFr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Client;
+use App\Models\Compte;
 use App\Services\OtpService;
 use App\Services\TransactionService;
 use App\Services\QrCodeService;
 use App\Traits\ApiResponses;
-use App\Http\Requests\SendOtpRequest;
-use App\Http\Requests\VerifyOtpRequest;
-use App\Http\Resources\ClientResource;
-use App\Http\Resources\ClientQrResource;
+use Laravel\Passport\Token;
 
 class ClientAuthController extends Controller
 {
@@ -33,59 +31,91 @@ class ClientAuthController extends Controller
         $this->qrCodeService = $qrCodeService;
     }
 
+
     /**
-     * Send OTP to client phone
+     * Send OTP for account activation
      */
-    public function sendOtp(SendOtpRequest $request)
+    public function sendOtpActivation(Request $request)
     {
-
-        $client = Client::parTelephone($request->telephone)->first();
-
-        if (!$client) {
-            return $this->errorResponse(MessageEnumFr::CLIENT_NON_TROUVE, 404);
-        }
-
-        // Check if client has an account
-        if (!$client->comptes()->exists()) {
-            return $this->errorResponse(MessageEnumFr::COMPTE_NON_TROUVE, 403);
-        }
-
-        $otp = $this->otpService->generateOtp($client);
-
-        return $this->successResponse([
-            'message' => MessageEnumFr::OTP_ENVOYE,
+        $request->validate([
+            'telephone' => 'required|string',
         ]);
+
+        $client = Client::where('telephone', $request->telephone)->first();
+        if (!$client) {
+            return $this->errorResponse('Client non trouvé', 404);
+        }
+
+        $compte = $client->comptes()->first();
+        if (!$compte || $compte->statut === 'actif') {
+            return $this->errorResponse('Compte déjà activé', 400);
+        }
+
+        $otpCode = $this->otpService->generateAndSendOtp($request->telephone, 'activation');
+
+        $data = config('twilio.services.sms.enabled') ? null : ['otp' => $otpCode];
+
+        return $this->successResponse($data, 'Code OTP envoyé avec succès');
     }
 
     /**
-     * Verify OTP and login client
+     * Send OTP for login
      */
-    public function verifyOtp(VerifyOtpRequest $request)
+    public function login(Request $request)
     {
+        $request->validate([
+            'telephone' => 'required|string',
+        ]);
 
-        $client = Client::parTelephone($request->telephone)->first();
-
+        $client = Client::where('telephone', $request->telephone)->first();
         if (!$client) {
-            return $this->errorResponse(MessageEnumFr::CLIENT_NON_TROUVE, 404);
+            return $this->errorResponse('Client non trouvé', 404);
         }
 
-        if (!$this->otpService->verifyOtp($client, $request->otp)) {
-            return $this->errorResponse(MessageEnumFr::OTP_INVALIDE_OU_EXPIRE, 401);
+        $compte = $client->comptes()->first();
+        if (!$compte || $compte->statut !== 'actif') {
+            return $this->errorResponse('Votre compte n\'est pas encore activé', 400);
         }
 
-        // Create access token for client
+        $otpCode = $this->otpService->generateAndSendOtp($request->telephone, 'login');
+
+        $data = config('twilio.services.sms.enabled') ? null : ['otp' => $otpCode];
+
+        return $this->successResponse($data, 'Code OTP envoyé avec succès');
+    }
+
+    /**
+     * Verify OTP for activation or login
+     */
+    public function verifyOtpNew(Request $request)
+    {
+        $request->validate([
+            'telephone' => 'required|string',
+            'otp' => 'required|string|size:6',
+        ]);
+
+        $verification = $this->otpService->verifyOtpCode($request->telephone, $request->otp);
+        if (!$verification) {
+            return $this->errorResponse('Code OTP invalide ou expiré', 401);
+        }
+
+        $client = Client::where('telephone', $request->telephone)->first();
+
+        if ($verification->type === 'activation') {
+            // Activate account
+            $compte = $client->comptes()->first();
+            $compte->update(['statut' => 'actif']);
+        }
+
+        // Generate OAuth2 tokens
         $token = $client->createToken('ClientToken');
-
-        // Generate QR code
-        $qrCodeData = $this->qrCodeService->generateClientQrCode($client);
+        $refreshToken = $token->token;
 
         return $this->successResponse([
-            'client' => new ClientResource($client->load('comptes')),
-            'qr_code' => new ClientQrResource($qrCodeData),
             'access_token' => $token->accessToken,
-            'refresh_token' => $token->token->id, // Laravel Passport refresh token
+            'refresh_token' => $refreshToken->id,
             'token_type' => 'Bearer',
-        ], MessageEnumFr::LOGIN_REUSSI);
+        ], 'Connexion réussie');
     }
 
     /**

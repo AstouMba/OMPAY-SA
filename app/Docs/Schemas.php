@@ -10,14 +10,12 @@ use OpenApi\Annotations as OA;
  *     type="object",
  *     title="Client",
  *     description="Modèle représentant un client",
- *     @OA\Property(property="id", type="string", format="uuid", description="ID unique du client"),
- *     @OA\Property(property="nom", type="string", description="Nom du client"),
- *     @OA\Property(property="prenom", type="string", description="Prénom du client"),
- *     @OA\Property(property="telephone", type="string", description="Numéro de téléphone"),
- *     @OA\Property(property="nci", type="string", description="Numéro de carte d'identité"),
- *     @OA\Property(property="date_creation", type="string", format="date-time", description="Date de création"),
- *     @OA\Property(property="date_modification", type="string", format="date-time", description="Date de mise à jour"),
- *     @OA\Property(property="comptes", type="array", @OA\Items(ref="#/components/schemas/Compte"), description="Liste des comptes du client")
+ *     @OA\Property(property="id", type="string", format="uuid", example="3fa85f64-5717-4562-b3fc-2c963f66afa6", description="ID unique du client"),
+ *     @OA\Property(property="nom", type="string", example="string", description="Nom du client"),
+ *     @OA\Property(property="prenom", type="string", example="string", description="Prénom du client"),
+ *     @OA\Property(property="telephone", type="string", example="string", description="Numéro de téléphone"),
+ *     @OA\Property(property="nci", type="string", example="string", description="Numéro de carte d'identité"),
+ *     @OA\Property(property="statut", type="string", enum={"actif", "inactif"}, example="inactif", description="Statut du compte associé")
  * )
  *
  * @OA\Schema(
@@ -31,9 +29,8 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="type_compte", type="string", description="Type de compte"),
  *     @OA\Property(property="devise", type="string", description="Devise du compte"),
  *     @OA\Property(property="solde", type="number", format="float", description="Solde actuel du compte"),
- *     @OA\Property(property="est_supprime", type="boolean", description="Statut de suppression"),
+ *     @OA\Property(property="statut", type="string", enum={"actif", "inactif"}, description="Statut du compte"),
  *     @OA\Property(property="date_creation", type="string", format="date-time", description="Date de création"),
- *     @OA\Property(property="date_modification", type="string", format="date-time", description="Date de mise à jour"),
  *     @OA\Property(property="transactions", type="array", @OA\Items(ref="#/components/schemas/Transaction"), description="Liste des transactions du compte")
  * )
  *
@@ -50,7 +47,6 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="montant", type="string", description="Montant de la transaction (avec préfixe + ou - selon le type)"),
  *     @OA\Property(property="statut", type="string", enum={"en_attente", "validee", "annulee"}, description="Statut de la transaction"),
  *     @OA\Property(property="date_creation", type="string", format="date-time", description="Date de création"),
- *     @OA\Property(property="date_modification", type="string", format="date-time", description="Date de mise à jour")
  * )
 
  * @OA\Schema(
@@ -63,7 +59,6 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="code_marchand", type="string", description="Code unique du marchand"),
  *     @OA\Property(property="telephone", type="string", description="Numéro de téléphone du marchand"),
  *     @OA\Property(property="date_creation", type="string", format="date-time", description="Date de création"),
- *     @OA\Property(property="date_modification", type="string", format="date-time", description="Date de mise à jour")
  * )
  *
  * @OA\Schema(
@@ -108,8 +103,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="success", type="boolean", example=true, description="Statut de succès"),
  *     @OA\Property(property="message", type="string", description="Message de succès"),
  *     @OA\Property(property="data", type="object",
- *         @OA\Property(property="client", ref="#/components/schemas/Client"),
- *         @OA\Property(property="compte", ref="#/components/schemas/Compte")
+ *         @OA\Property(property="client", ref="#/components/schemas/Client")
  *     )
  * )
  *
@@ -123,8 +117,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="email", type="string", format="email", description="Email de l'utilisateur"),
  *     @OA\Property(property="role", type="string", enum={"admin", "user"}, description="Rôle de l'utilisateur"),
  *     @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true, description="Date de vérification email"),
- *     @OA\Property(property="created_at", type="string", format="date-time", description="Date de création"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", description="Date de mise à jour")
+ *   @OA\Property(property="created_at", type="string", format="date-time", description="Date de création"),
  * )
  *
  * @OA\Schema(
@@ -167,9 +160,7 @@ use OpenApi\Annotations as OA;
  *         @OA\Property(property="user", ref="#/components/schemas/User", description="Informations utilisateur (admin)"),
  *         @OA\Property(property="client", ref="#/components/schemas/Client", description="Informations client"),
  *         @OA\Property(property="access_token", type="string", description="Token d'accès JWT"),
- *         @OA\Property(property="refresh_token", type="string", description="Token de rafraîchissement (id du token, si applicable)"),
- *         @OA\Property(property="token_type", type="string", example="Bearer", description="Type de token")
- *     )
+ *         @OA\Property(property="refresh_token", type="string", description="Token de rafraîchissement (id du token, si applicable)"), *     )
  * )
  *
  * @OA\Schema(
