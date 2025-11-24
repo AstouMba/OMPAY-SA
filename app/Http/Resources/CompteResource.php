@@ -18,7 +18,6 @@ class CompteResource extends JsonResource
             'solde' => $this->solde(),
             'est_supprime' => $this->est_supprime,
             'date_creation' => $this->created_at,
-            'date_modification' => $this->updated_at,
             'transactions' => TransactionResource::collection($this->whenLoaded('transactions')),
         ];
     }

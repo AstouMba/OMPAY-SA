@@ -26,7 +26,6 @@ class TransactionResource extends JsonResource
             'montant' => $prefix . $this->montant,
             'statut' => $this->statut,
             'date_creation' => $this->created_at,
-            'date_modification' => $this->updated_at,
         ];
     }
 }

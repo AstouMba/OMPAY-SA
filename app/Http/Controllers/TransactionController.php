@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\TransactionService;
 use App\Traits\ApiResponses;
 use App\Enums\MessageEnumFr;
+use App\Http\Resources\TransactionResource;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -42,17 +43,29 @@ class TransactionController extends Controller
                 'montant_max'
             ]);
 
-            $transactions = $this->transactionService->getTransactionsForAuthenticatedClient($client->id, $filters, $perPage);
+            // Filtre par défaut pour les transactions validées si aucun statut spécifié
+            if (!isset($filters['statut'])) {
+                $filters['statut'] = 'validee';
+            }
+
+$transactions = $this->transactionService->getTransactionsForAuthenticatedClient($client->id, $filters, $perPage);
+
+            // Appliquer le resource pour formater les montants avec + et -
+            $formattedTransactions = TransactionResource::collection($transactions);
 
             // Liens HATEOAS pour niveau 3 Richardson
+            $compte = $client->comptes()->first();
             $links = [
                 'self' => route('transactions.index', $request->query()),
-                'client' => route('client.user'),
-                'solde' => route('client.solde'),
+                'compte' => route('client.compte'),
             ];
 
+            if ($compte) {
+                $links['solde'] = route('client.solde', ['numero' => $compte->numero_compte]);
+            }
+
             return $this->paginatedResponse(
-                $transactions,
+                $formattedTransactions,
                 $links,
                 MessageEnumFr::LISTE_TRANSACTIONS_RECUPEREE
             );

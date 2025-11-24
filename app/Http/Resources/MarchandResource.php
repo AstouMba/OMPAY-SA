@@ -15,7 +15,6 @@ class MarchandResource extends JsonResource
             'code_marchand' => $this->code_marchand,
             'telephone' => $this->telephone,
             'date_creation' => $this->created_at,
-            'date_modification' => $this->updated_at,
         ];
     }
 }

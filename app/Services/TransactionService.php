@@ -2,8 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\Marchand;
+use App\Models\Client;
+use App\Models\Compte;
 use App\Repository\TransactionRepository;
 use App\Services\FeeService;
+use App\Rules\TelephoneSenegalRule;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -56,10 +60,54 @@ class TransactionService
 
         // Find merchant
         $marchand = null;
+        $typeIdentifiant = null;
+        
         if (isset($data['code_marchand'])) {
-            $marchand = \App\Models\Marchand::where('code_marchand', $data['code_marchand'])->first();
-        } elseif (isset($data['numero_marchand'])) {
-            $marchand = \App\Models\Marchand::where('telephone', $data['numero_marchand'])->first();
+            // Vérifier le format du code marchand (M + 6 chiffres)
+            if (!preg_match('/^M\d{6}$/', $data['code_marchand'])) {
+                throw new \Exception('Format code marchand invalide. Utilisez le format M + 6 chiffres (ex: M123456)');
+            }
+            
+            $marchand = Marchand::where('code_marchand', $data['code_marchand'])->first();
+            $typeIdentifiant = 'code_marchand';
+} elseif (isset($data['numero_marchand'])) {
+            // Utiliser la règle de validation existante pour le téléphone sénégalais
+            $validator = new TelephoneSenegalRule();
+            $isValid = true;
+            
+            $validator->validate('numero_marchand', $data['numero_marchand'], function($message) use (&$isValid) {
+                $isValid = false;
+            });
+            
+            if (!$isValid) {
+                throw new \Exception('Format numéro de téléphone invalide');
+            }
+            
+            // Vérifier d'abord si c'est un client OMPay (priorité)
+            $client = Client::where('telephone', $data['numero_marchand'])->first();
+            if ($client) {
+                // Vérifier que le client a un compte OMPay actif
+                $compte = Compte::where('client_id', $client->id)
+                    ->where('type_compte', 'ompay')
+                    ->where('statut', 'actif')
+                    ->first();
+                
+                if ($compte) {
+                    // Le numéro correspond à un client OMPay, créer un marchand temporaire
+                    $marchand = new Marchand([
+                        'nom' => $client->nom . ' ' . $client->prenom,
+                        'telephone' => $client->telephone,
+                        'code_marchand' => 'TMP_' . $client->telephone, // Code temporaire
+                    ]);
+                    $typeIdentifiant = 'numero_client_ompay';
+                } else {
+                    throw new \Exception('Ce numéro correspond à un client sans compte OMPay actif');
+                }
+            } else {
+                // Sinon chercher dans les marchands existants
+                $marchand = Marchand::where('telephone', $data['numero_marchand'])->first();
+                $typeIdentifiant = 'numero_marchand';
+            }
         }
 
         if (!$marchand) {
