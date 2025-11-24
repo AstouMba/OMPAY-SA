@@ -39,7 +39,7 @@ class SoldeController extends Controller
         $data = [
             'compte_id' => $compte->id,
             'numero_compte' => $compte->numero_compte,
-            'solde' => $compte->solde,
+            'solde' => $compte->solde(), // Utiliser la méthode calculée
             'devise' => $compte->devise,
         ];
 

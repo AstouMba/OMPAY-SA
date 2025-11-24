@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Transaction;
 use App\Services\QrCodeService;
 use App\Traits\ApiResponses;
+use App\Http\Resources\TransactionResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,38 +41,42 @@ class ClientController extends Controller
         // Get all transactions for this client's account
         $transactions = Transaction::where('compte_id', $compte->id)
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($transaction) use ($client) {
-                // Determine if transaction is incoming or outgoing based on type
-                $isIncoming = in_array($transaction->type, ['depot', 'transfert_credit']);
-                $isOutgoing = in_array($transaction->type, ['retrait', 'transfert_debit', 'paiement_marchand']);
+            ->with('marchand') // Charger la relation marchand
+            ->get();
 
-                // Map transaction types to display types
-                $displayType = match($transaction->type) {
-                    'depot' => 'reception',
-                    'retrait' => 'retrait',
-                    'transfert_credit' => 'reception',
-                    'transfert_debit' => 'transfert',
-                    'paiement_marchand' => 'paiement',
-                    default => $transaction->type
-                };
+        // Formatter les transactions avec TransactionResource pour avoir les signes + et -
+        $formattedTransactions = TransactionResource::collection($transactions);
 
-                // Determine telephone to show (other party)
-                $telephone = match($transaction->type) {
-                    'transfert_credit', 'transfert_debit' => $transaction->telephone_marchand ?? $client->telephone,
-                    'paiement_marchand' => $transaction->telephone_marchand ?? $client->telephone,
-                    'retrait' => $client->telephone, // retrait shows client's own number
-                    'depot' => $client->telephone, // depot shows client's own number
-                    default => $client->telephone
-                };
+        // Réformatter pour correspondre au format attendu avec type et telephone
+        $transactionsData = $formattedTransactions->map(function ($transaction) use ($client) {
+            $transactionArray = $transaction->toArray(request());
 
-                return [
-                    'type' => $displayType,
-                    'telephone' => $telephone,
-                    'montant' => $isIncoming ? $transaction->montant : -$transaction->montant,
-                    'date_transaction' => $transaction->created_at->toISOString(),
-                ];
-            });
+            // Map transaction types to display types
+            $displayType = match($transaction->type) {
+                'depot' => 'reception',
+                'retrait' => 'retrait',
+                'transfert_credit' => 'reception',
+                'transfert_debit' => 'transfert',
+                'paiement_marchand' => 'paiement',
+                default => $transaction->type 
+            };
+
+            // Determine telephone to show (other party)
+            $telephone = match($transaction->type) {
+                'transfert_credit', 'transfert_debit' => $transaction->telephone_marchand ?? $client->telephone,
+                'paiement_marchand' => $transaction->telephone_marchand ?? $client->telephone,
+                'retrait' => $client->telephone, // retrait shows client's own number
+                'depot' => $client->telephone, // depot shows client's own number
+                default => $client->telephone
+            };
+
+            return [
+                'type' => $displayType,
+                'telephone' => $telephone,
+                'montant' => $transactionArray['montant'], // Déjà formaté avec + et - par TransactionResource
+                'date_transaction' => $transaction->created_at->toISOString(),
+            ];
+        });
 
         // Generate QR code
         $qrCodeData = $this->qrCodeService->generateClientQrCode($client);
@@ -91,7 +96,7 @@ class ClientController extends Controller
                 'solde' => $compte->solde,
                 'statut' => $compte->statut,
             ],
-            'transactions' => $transactions,
+            'transactions' => $transactionsData,
             'qrcode' => $qrCode,
         ];
 

@@ -11,7 +11,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Get(
- *     path="/client/transactions",
+ *     path="/compte/transactions",
  *     summary="Historique des transactions",
  *     description="Récupère l'historique des transactions du client connecté",
  *     operationId="getTransactions",
@@ -58,7 +58,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Post(
- *     path="/client/transactions/payment",
+ *     path="/compte/transactions/payment",
  *     summary="Paiement marchand",
  *     description="Effectue un paiement chez un marchand",
  *     operationId="payment",
@@ -116,7 +116,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Post(
- *     path="/client/transactions/transfert",
+ *     path="/compte/transactions/transfert",
  *     summary="Transfert entre clients OMPay",
  *     description="Effectue un transfert d'argent vers un autre client OMPay",
  *     operationId="transfert",

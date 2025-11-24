@@ -40,12 +40,12 @@ Route::prefix('v1/admin')->group(function () {
 });
 
 // Client Authentication Routes
-Route::prefix('v1/client')->group(function () {
+Route::prefix('v1/compte')->group(function () {
     Route::post('/send-otp', [ClientAuthController::class, 'sendOtpActivation']);
     Route::post('/login', [ClientAuthController::class, 'login']);
     Route::post('/verify-otp', [ClientAuthController::class, 'verifyOtpNew']);
     Route::middleware('auth:client')->group(function () {
-        Route::get('/compte', [ClientController::class, 'compte'])->name('client.compte');
+        Route::get('/me', [ClientController::class, 'compte'])->name('client.compte');
         Route::get('/{numero}/solde', [SoldeController::class, 'show'])->name('client.solde');
         Route::post('/logout', [ClientAuthController::class, 'logout'])->name('client.logout');
         Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');

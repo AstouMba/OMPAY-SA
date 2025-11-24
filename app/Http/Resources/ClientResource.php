@@ -16,7 +16,6 @@ class ClientResource extends JsonResource
             'telephone' => $this->telephone,
             'nci' => $this->nci,
             'date_creation' => $this->created_at,
-            'date_modification' => $this->updated_at,
             'comptes' => CompteResource::collection($this->whenLoaded('comptes')),
         ];
     }

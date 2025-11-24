@@ -9,7 +9,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Post(
- *     path="/client/send-otp",
+ *     path="/compte/send-otp",
  *     summary="Envoyer un code OTP",
  *     description="Envoie un code OTP au numéro de téléphone du client pour l'authentification",
  *     operationId="sendOtp",
@@ -51,8 +51,8 @@ use OpenApi\Annotations as OA;
  * )
  *
  * /**
- * @OA\Post(
- *     path="/client/login",
+  * @OA\Post(
+  *     path="/compte/login",
  *     summary="Envoyer OTP pour connexion",
  *     description="Envoie un code OTP au client actif pour se connecter",
  *     operationId="clientLogin",
@@ -85,7 +85,7 @@ use OpenApi\Annotations as OA;
  *     )
  * )
  * @OA\Post(
- *     path="/client/verify-otp",
+ *     path="/compte/verify-otp",
  *     summary="Vérifier OTP et authentifier",
  *     description="Vérifie le code OTP et active le compte ou connecte le client selon le type",
  *     operationId="verifyOtpNew",
@@ -120,7 +120,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Get(
- *     path="/client/compte",
+ *     path="/compte/me",
  *     summary="Récupérer le profil client",
  *     description="Récupère les informations du client connecté, son compte, ses transactions et son QR code",
  *     operationId="getClientProfile",
@@ -172,7 +172,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Get(
- *     path="/client/{numero}/solde",
+ *     path="/compte/{numero}/solde",
  *     summary="Récupérer le solde d'un compte",
  *     description="Récupère le solde actuel d'un compte spécifique appartenant au client connecté",
  *     operationId="getAccountBalance",
@@ -218,7 +218,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Post(
- *     path="/client/logout",
+ *     path="/compte/logout",
  *     summary="Déconnexion client",
  *     description="Déconnecte le client actuellement connecté",
  *     operationId="clientLogout",
