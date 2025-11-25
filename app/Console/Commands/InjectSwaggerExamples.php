@@ -95,6 +95,26 @@ class InjectSwaggerExamples extends Command
             }
         }
 
+        // Exemple de réponse OTP avec email
+        $otpExample = [
+            'success' => true,
+            'message' => 'Code OTP envoyé avec succès',
+            'data' => [
+                'otp_sent' => true,
+                'message' => 'Code OTP envoyé par email',
+                'otp' => null
+            ],
+        ];
+
+        // Injecter exemple OTP dans les endpoints appropriés
+        if (isset($json['paths']['/v1/client/send-otp-activation']['post']['responses']['200']['content']['application/json'])) {
+            $json['paths']['/v1/client/send-otp-activation']['post']['responses']['200']['content']['application/json']['examples']['otpEmailExample'] = ['value' => $otpExample];
+        }
+
+        if (isset($json['paths']['/v1/client/login']['post']['responses']['200']['content']['application/json'])) {
+            $json['paths']['/v1/client/login']['post']['responses']['200']['content']['application/json']['examples']['otpEmailExample'] = ['value' => $otpExample];
+        }
+
         // Ecrire le JSON modifié
         file_put_contents($path, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 

@@ -53,7 +53,14 @@ class ClientAuthController extends Controller
 
         $otpCode = $this->otpService->generateAndSendOtp($request->telephone, 'activation');
 
-        $data = config('twilio.services.sms.enabled') ? null : ['otp' => $otpCode];
+        // Always return meaningful data about OTP status
+        $data = [
+            'otp_sent' => env('OTP_SEND_EMAIL', false),
+            'message' => env('OTP_SEND_EMAIL', false) 
+                ? 'Code OTP envoyé par email' 
+                : 'Code OTP généré (email désactivé)',
+            'otp' => env('OTP_SEND_EMAIL', false) ? null : $otpCode
+        ];
 
         return $this->successResponse($data, 'Code OTP envoyé avec succès');
     }
@@ -79,7 +86,14 @@ class ClientAuthController extends Controller
 
         $otpCode = $this->otpService->generateAndSendOtp($request->telephone, 'login');
 
-        $data = config('twilio.services.sms.enabled') ? null : ['otp' => $otpCode];
+        // Always return meaningful data about OTP status
+        $data = [
+            'otp_sent' => env('OTP_SEND_EMAIL', false),
+            'message' => env('OTP_SEND_EMAIL', false) 
+                ? 'Code OTP envoyé par email' 
+                : 'Code OTP généré (email désactivé)',
+            'otp' => env('OTP_SEND_EMAIL', false) ? null : $otpCode
+        ];
 
         return $this->successResponse($data, 'Code OTP envoyé avec succès');
     }

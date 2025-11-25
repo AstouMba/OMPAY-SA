@@ -10,18 +10,18 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000/api/v1",
+            "url": "http:\/\/localhost:8000\/api\/v1",
             "description": "Serveur de développement"
         },
         {
-            "url": "https://ompay-sa.onrender.com/api/v1",
+            "url": "https:\/\/ompay-sa.onrender.com\/api\/v1",
             "description": "Serveur de production"
         }
     ],
     "paths": {
-        "/user": {},
-        "/v1/admin/clients": {},
-        "/admin/login": {
+        "\/user": [],
+        "\/v1\/admin\/clients": [],
+        "\/admin\/login": {
             "post": {
                 "tags": [
                     "Administration"
@@ -32,7 +32,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
                                 "required": [
                                     "email",
@@ -61,7 +61,7 @@
                     "200": {
                         "description": "Connexion réussie",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -75,7 +75,7 @@
                                         "data": {
                                             "properties": {
                                                 "user": {
-                                                    "$ref": "#/components/schemas/User"
+                                                    "$ref": "#\/components\/schemas\/User"
                                                 },
                                                 "access_token": {
                                                     "description": "Token d'accès",
@@ -101,9 +101,9 @@
                     "401": {
                         "description": "Identifiants invalides",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -111,9 +111,9 @@
                     "403": {
                         "description": "Accès interdit",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -121,7 +121,7 @@
                 }
             }
         },
-        "/admin/logout": {
+        "\/admin\/logout": {
             "post": {
                 "tags": [
                     "Administration"
@@ -133,7 +133,7 @@
                     "200": {
                         "description": "Déconnexion réussie",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -153,9 +153,9 @@
                     "401": {
                         "description": "Token invalide",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -168,20 +168,20 @@
                 ]
             }
         },
-        "/admin/clients": {
+        "\/admin\/clients": {
             "post": {
                 "tags": [
                     "Administration"
                 ],
                 "summary": "Créer un client et son compte",
-                "description": "Crée un nouveau client avec son compte associé. Remarque : l'admin doit être authentifié (access_token) et posséder un refresh_token obtenu via /v1/admin/login avant d'appeler cette route.",
+                "description": "Crée un nouveau client avec son compte associé. Remarque : l'admin doit être authentifié (access_token) et posséder un refresh_token obtenu via \/v1\/admin\/login avant d'appeler cette route.",
                 "operationId": "createClient",
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CreateClientRequest"
+                                "$ref": "#\/components\/schemas\/CreateClientRequest"
                             }
                         }
                     }
@@ -190,9 +190,9 @@
                     "200": {
                         "description": "Client et compte créés avec succès",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CreateClientResponse"
+                                    "$ref": "#\/components\/schemas\/CreateClientResponse"
                                 }
                             }
                         }
@@ -200,9 +200,9 @@
                     "401": {
                         "description": "Non authentifié",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -210,9 +210,9 @@
                     "422": {
                         "description": "Erreur de validation ou données invalides",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -225,7 +225,7 @@
                 ]
             }
         },
-        "/admin/transaction-fees": {
+        "\/admin\/transaction-fees": {
             "get": {
                 "tags": [
                     "Administration"
@@ -237,7 +237,7 @@
                     "200": {
                         "description": "Configurations récupérées",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -287,9 +287,9 @@
                     "401": {
                         "description": "Non authentifié",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -302,7 +302,7 @@
                 ]
             }
         },
-        "/admin/transaction-fees/{type}": {
+        "\/admin\/transaction-fees\/{type}": {
             "put": {
                 "tags": [
                     "Administration"
@@ -325,7 +325,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
                                 "properties": {
                                     "pourcentage_frais": {
@@ -341,7 +341,7 @@
                                         "example": 100
                                     },
                                     "actif": {
-                                        "description": "Activer/désactiver ces frais",
+                                        "description": "Activer\/désactiver ces frais",
                                         "type": "boolean",
                                         "example": true
                                     }
@@ -355,7 +355,7 @@
                     "200": {
                         "description": "Configuration mise à jour",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -402,9 +402,9 @@
                     "401": {
                         "description": "Non authentifié",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -412,7 +412,7 @@
                     "500": {
                         "description": "Erreur serveur",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -437,7 +437,7 @@
                 ]
             }
         },
-        "/admin/transaction-fees/calculate": {
+        "\/admin\/transaction-fees\/calculate": {
             "post": {
                 "tags": [
                     "Administration"
@@ -448,7 +448,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
                                 "properties": {
                                     "montant": {
@@ -471,7 +471,7 @@
                     "200": {
                         "description": "Frais calculés",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -509,9 +509,9 @@
                     "401": {
                         "description": "Non authentifié",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -524,7 +524,7 @@
                 ]
             }
         },
-        "/compte/send-otp": {
+        "\/compte\/send-otp": {
             "post": {
                 "tags": [
                     "Authentification Client"
@@ -535,7 +535,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
                                 "required": [
                                     "telephone"
@@ -556,7 +556,7 @@
                     "200": {
                         "description": "Code OTP envoyé avec succès",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -585,9 +585,9 @@
                     "404": {
                         "description": "Client non trouvé",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -595,9 +595,9 @@
                     "403": {
                         "description": "Le client ne possède pas de compte",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -605,9 +605,9 @@
                     "422": {
                         "description": "Numéro de téléphone invalide",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -615,7 +615,7 @@
                 }
             }
         },
-        "/compte/login": {
+        "\/compte\/login": {
             "post": {
                 "tags": [
                     "Client"
@@ -626,7 +626,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
                                 "required": [
                                     "telephone"
@@ -647,7 +647,7 @@
                     "200": {
                         "description": "OTP envoyé avec succès",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -667,9 +667,9 @@
                     "404": {
                         "description": "Client non trouvé",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -677,9 +677,9 @@
                     "400": {
                         "description": "Compte non activé",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -687,7 +687,7 @@
                 }
             }
         },
-        "/compte/verify-otp": {
+        "\/compte\/verify-otp": {
             "post": {
                 "tags": [
                     "Client"
@@ -698,7 +698,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
                                 "required": [
                                     "telephone",
@@ -725,7 +725,7 @@
                     "200": {
                         "description": "Connexion réussie",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -762,9 +762,9 @@
                     "401": {
                         "description": "OTP invalide ou expiré",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -772,7 +772,7 @@
                 }
             }
         },
-        "/compte/me": {
+        "\/compte\/me": {
             "get": {
                 "tags": [
                     "Client"
@@ -784,7 +784,7 @@
                     "200": {
                         "description": "Profil client récupéré avec succès",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -876,7 +876,7 @@
                                                 },
                                                 "qrcode": {
                                                     "type": "string",
-                                                    "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+                                                    "example": "data:image\/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
                                                 }
                                             },
                                             "type": "object"
@@ -890,9 +890,9 @@
                     "401": {
                         "description": "Client non authentifié",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -900,9 +900,9 @@
                     "404": {
                         "description": "Aucun compte trouvé",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -915,7 +915,7 @@
                 ]
             }
         },
-        "/compte/{numero}/solde": {
+        "\/compte\/{numero}\/solde": {
             "get": {
                 "tags": [
                     "Client"
@@ -939,7 +939,7 @@
                     "200": {
                         "description": "Solde récupéré avec succès",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "status": {
@@ -981,9 +981,9 @@
                     "401": {
                         "description": "Client non authentifié",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -991,9 +991,9 @@
                     "404": {
                         "description": "Compte non trouvé ou accès non autorisé",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -1001,9 +1001,9 @@
                     "403": {
                         "description": "Compte inactif",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -1016,7 +1016,7 @@
                 ]
             }
         },
-        "/compte/logout": {
+        "\/compte\/logout": {
             "post": {
                 "tags": [
                     "Authentification Client"
@@ -1028,7 +1028,7 @@
                     "200": {
                         "description": "Déconnexion réussie",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -1048,9 +1048,9 @@
                     "401": {
                         "description": "Token invalide",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -1063,7 +1063,7 @@
                 ]
             }
         },
-        "/compte/transactions": {
+        "\/compte\/transactions": {
             "get": {
                 "tags": [
                     "Transactions"
@@ -1097,7 +1097,7 @@
                     "200": {
                         "description": "Transactions récupérées",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -1111,7 +1111,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/Transaction"
+                                                "$ref": "#\/components\/schemas\/Transaction"
                                             }
                                         }
                                     },
@@ -1123,9 +1123,9 @@
                     "401": {
                         "description": "Non authentifié",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -1133,7 +1133,7 @@
                     "500": {
                         "description": "Erreur lors de la récupération",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -1158,7 +1158,7 @@
                 ]
             }
         },
-        "/compte/transactions/payment": {
+        "\/compte\/transactions\/payment": {
             "post": {
                 "tags": [
                     "Transactions"
@@ -1169,7 +1169,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
                                 "properties": {
                                     "code_marchand": {
@@ -1197,7 +1197,7 @@
                     "200": {
                         "description": "Paiement effectué",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -1247,7 +1247,7 @@
                     "400": {
                         "description": "Erreur de validation",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -1267,9 +1267,9 @@
                     "401": {
                         "description": "Non authentifié",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -1277,7 +1277,7 @@
                     "500": {
                         "description": "Erreur serveur",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -1302,7 +1302,7 @@
                 ]
             }
         },
-        "/compte/transactions/transfert": {
+        "\/compte\/transactions\/transfert": {
             "post": {
                 "tags": [
                     "Transactions"
@@ -1313,7 +1313,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
                                 "properties": {
                                     "numero_ompay": {
@@ -1336,7 +1336,7 @@
                     "200": {
                         "description": "Transfert effectué avec succès",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -1412,7 +1412,7 @@
                     "400": {
                         "description": "Erreur de validation",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -1432,9 +1432,9 @@
                     "401": {
                         "description": "Non authentifié",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#\/components\/schemas\/ErrorResponse"
                                 }
                             }
                         }
@@ -1442,7 +1442,7 @@
                     "500": {
                         "description": "Erreur serveur",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
@@ -1526,7 +1526,7 @@
                         "type": "string"
                     },
                     "client": {
-                        "$ref": "#/components/schemas/Client"
+                        "$ref": "#\/components\/schemas\/Client"
                     },
                     "type_compte": {
                         "description": "Type de compte",
@@ -1558,7 +1558,7 @@
                         "description": "Liste des transactions du compte",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/Transaction"
+                            "$ref": "#\/components\/schemas\/Transaction"
                         }
                     }
                 },
@@ -1579,7 +1579,7 @@
                         "format": "uuid"
                     },
                     "marchand": {
-                        "$ref": "#/components/schemas/Marchand"
+                        "$ref": "#\/components\/schemas\/Marchand"
                     },
                     "telephone_marchand": {
                         "description": "Téléphone du marchand (optionnel)",
@@ -1737,13 +1737,24 @@
                     "data": {
                         "properties": {
                             "client": {
-                                "$ref": "#/components/schemas/Client"
+                                "$ref": "#\/components\/schemas\/Client"
                             }
                         },
                         "type": "object"
                     }
                 },
-                "type": "object"
+                "type": "object",
+                "example": {
+                    "success": true,
+                    "message": "Client récupéré",
+                    "data": {
+                        "id": "53de2467-6bb3-403c-92e2-b55276a3918f",
+                        "nom": "Astou",
+                        "prenom": "Mbow",
+                        "telephone": "+221771234567",
+                        "nci": "2234567890123"
+                    }
+                }
             },
             "User": {
                 "title": "Utilisateur Administrateur",
@@ -1856,10 +1867,10 @@
                     "data": {
                         "properties": {
                             "user": {
-                                "$ref": "#/components/schemas/User"
+                                "$ref": "#\/components\/schemas\/User"
                             },
                             "client": {
-                                "$ref": "#/components/schemas/Client"
+                                "$ref": "#\/components\/schemas\/Client"
                             },
                             "access_token": {
                                 "description": "Token d'accès JWT",
@@ -1873,7 +1884,22 @@
                         "type": "object"
                     }
                 },
-                "type": "object"
+                "type": "object",
+                "example": {
+                    "success": true,
+                    "message": "Connexion réussie",
+                    "data": {
+                        "user": {
+                            "id": 1,
+                            "name": "Admin Test",
+                            "email": "admin@example.com",
+                            "role": "admin"
+                        },
+                        "access_token": "eyJhbGci...example",
+                        "refresh_token": "refresh_token_example",
+                        "token_type": "Bearer"
+                    }
+                }
             },
             "ClientQrResponse": {
                 "title": "Réponse QR Code Client",
@@ -1887,7 +1913,7 @@
                     "qr_code_base64": {
                         "description": "QR Code encodé en Base64 avec préfixe data URI",
                         "type": "string",
-                        "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+                        "example": "data:image\/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
                     }
                 },
                 "type": "object"

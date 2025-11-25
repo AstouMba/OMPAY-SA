@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use App\Utils\GenererUuid;
 
 class Client extends Authenticatable
 {
-    use HasFactory, HasApiTokens, GenererUuid;
+    use HasFactory, HasApiTokens, Notifiable, GenererUuid;
 
     protected $table = 'clients';
     public $incrementing = false; // UUID
@@ -21,6 +22,8 @@ class Client extends Authenticatable
         'prenom',
         'telephone',
         'nci',
+        'email',
+        'email_verified_at',
         'otp_code',
         'otp_expires_at'
     ];

@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Client;
 use App\Models\OtpVerification;
+use App\Notifications\OtpEmailNotification;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Twilio\Rest\Client as TwilioClient;
 
 class OtpService
@@ -46,6 +48,33 @@ class OtpService
         }
 
         return $otp;
+    }
+
+    /**
+     * Send OTP via email
+     */
+    protected function sendOtpEmail(Client $client, string $otp, string $type): void
+    {
+        // Generate email from phone number if client doesn't have email
+        $email = $client->email ?? $this->generateEmailFromPhone($client->telephone);
+        
+        try {
+            $client->notify(new OtpEmailNotification($client, $otp, $type));
+            Log::info("OTP email sent successfully to client {$client->telephone} at {$email}");
+        } catch (\Exception $e) {
+            Log::error("Failed to send OTP email to {$client->telephone}: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Generate email from phone number
+     */
+    protected function generateEmailFromPhone(string $phoneNumber): string
+    {
+        // Remove any non-numeric characters from phone number
+        $cleanPhone = preg_replace('/\D/', '', $phoneNumber);
+        return $cleanPhone . '@gmail.com';
     }
 
     /**
@@ -147,12 +176,26 @@ class OtpService
         if (config('twilio.services.sms.enabled')) {
             try {
                 $this->sendOtpSms($telephone, $otp);
-                Log::info("OTP sent successfully to {$telephone} for {$type}");
+                Log::info("OTP SMS sent successfully to {$telephone} for {$type}");
             } catch (\Exception $e) {
-                Log::error("Failed to send OTP to {$telephone}: " . $e->getMessage());
+                Log::error("Failed to send OTP SMS to {$telephone}: " . $e->getMessage());
             }
         } else {
             Log::info("OTP SMS disabled - Code for {$telephone} ({$type}): {$otp}");
+        }
+
+        // Send OTP via Email if enabled
+        if (env('OTP_SEND_EMAIL', false)) {
+            try {
+                $client = Client::where('telephone', $telephone)->first();
+                if ($client) {
+                    $this->sendOtpEmail($client, $otp, $type);
+                }
+            } catch (\Exception $e) {
+                Log::error("Failed to send OTP email to {$telephone}: " . $e->getMessage());
+            }
+        } else {
+            Log::info("OTP Email disabled - Code for {$telephone} ({$type}): {$otp}");
         }
 
         return $otp;
