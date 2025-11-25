@@ -10,14 +10,20 @@ class ClientSeeder extends Seeder
 {
     public function run(): void
     {
-        Client::firstOrCreate(
+        $client = Client::firstOrCreate(
             ['telephone' => '+221781157773'],
             [
                 'id' => Str::uuid(),
                 'nom' => 'Astou',
                 'prenom' => 'Mbow',
                 'nci' => '2234567890123',
+                'email' => 'astou.odc@gmail.com',
             ]
         );
+
+        // S'assurer que l'email est toujours à jour
+        if ($client->email !== 'astou.odc@gmail.com') {
+            $client->update(['email' => 'astou.odc@gmail.com']);
+        }
     }
 }
