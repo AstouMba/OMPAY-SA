@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Client;
 use App\Models\OtpVerification;
 use App\Notifications\OtpEmailNotification;
+use App\Services\BrevoEmailService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Twilio\Rest\Client as TwilioClient;
@@ -12,6 +13,7 @@ use Twilio\Rest\Client as TwilioClient;
 class OtpService
 {
     protected $twilio;
+    protected $brevoEmailService;
 
     public function __construct()
     {
@@ -19,6 +21,7 @@ class OtpService
             config('twilio.sid'),
             config('twilio.token')
         );
+        $this->brevoEmailService = new BrevoEmailService();
     }
 
     /**
@@ -59,8 +62,15 @@ class OtpService
         $email = $client->email ?? $this->generateEmailFromPhone($client->telephone);
         
         try {
-            $client->notify(new OtpEmailNotification($client, $otp, $type));
-            Log::info("OTP email sent successfully to client {$client->telephone} at {$email}");
+            // Use Brevo API service instead of Laravel notifications
+            $clientName = trim($client->prenom . ' ' . $client->nom);
+            $success = $this->brevoEmailService->sendOtpEmail($email, $otp, $clientName, $type);
+            
+            if ($success) {
+                Log::info("OTP email sent successfully via Brevo API to client {$client->telephone} at {$email}");
+            } else {
+                Log::error("Failed to send OTP email via Brevo API to {$client->telephone}: {$email}");
+            }
         } catch (\Exception $e) {
             Log::error("Failed to send OTP email to {$client->telephone}: " . $e->getMessage());
             throw $e;

@@ -12,22 +12,25 @@ use App\Services\OtpService;
 echo "Testing Email OTP functionality...\n\n";
 
 // Create or find a test client
-$testClient = Client::first();
+$testClient = Client::where('email', 'astou.odc@gmail.com')
+                    ->orWhere('telephone', '221781157773')
+                    ->first();
 if (!$testClient) {
     $testClient = Client::create([
-        'nom' => 'Test',
-        'prenom' => 'Client',
-        'telephone' => '771234567',
-        'nci' => '123456789',
+        'nom' => 'Astou',
+        'prenom' => 'ODC',
+        'telephone' => '221781157773',
+        'nci' => 'ODC' . time(), // Use unique NCI
+        'email' => 'astou.odc@gmail.com',
     ]);
     echo "Created new test client: {$testClient->nom} {$testClient->prenom}\n";
 } else {
     echo "Using existing client: {$testClient->nom} {$testClient->prenom}\n";
+    // Update both phone and email for testing
+    $testClient->telephone = '221781157773';
+    $testClient->email = 'astou.odc@gmail.com';
+    $testClient->save();
 }
-
-// Update the client with an email for testing
-$testClient->email = 'astoumbow51@gmail.com';
-$testClient->save();
 
 echo "Client email: {$testClient->email}\n\n";
 
