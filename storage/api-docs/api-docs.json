@@ -701,15 +701,9 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "telephone",
                                     "otp"
                                 ],
                                 "properties": {
-                                    "telephone": {
-                                        "description": "Numéro de téléphone du client",
-                                        "type": "string",
-                                        "example": "+221781157773"
-                                    },
                                     "otp": {
                                         "description": "Code OTP à 6 chiffres",
                                         "type": "string",
@@ -1458,6 +1452,281 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/compte/send-otp": {
+            "post": {
+                "tags": [
+                    "Authentification Client"
+                ],
+                "summary": "Demande d'envoi de code OTP pour activation de compte",
+                "description": "Send OTP for account activation",
+                "operationId": "809354073b67cf54d39a7531b3e2c742",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "telephone"
+                                ],
+                                "properties": {
+                                    "telephone": {
+                                        "description": "Numéro de téléphone du client",
+                                        "type": "string",
+                                        "example": "+221781157773"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Code OTP envoyé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Code OTP envoyé avec succès"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "otp_sent": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Code OTP envoyé par email"
+                                                },
+                                                "otp": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Client non trouvé"
+                    },
+                    "400": {
+                        "description": "Compte déjà activé"
+                    }
+                }
+            }
+        },
+        "/api/v1/compte/login": {
+            "post": {
+                "tags": [
+                    "Authentification Client"
+                ],
+                "summary": "Demande d'envoi de code OTP pour connexion client",
+                "description": "Send OTP for login",
+                "operationId": "e0c73dfdca2cf239e70184f979abc3cb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "telephone"
+                                ],
+                                "properties": {
+                                    "telephone": {
+                                        "description": "Numéro de téléphone du client",
+                                        "type": "string",
+                                        "example": "+221781157773"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Code OTP envoyé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Code OTP envoyé avec succès"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "otp_sent": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Code OTP envoyé par email"
+                                                },
+                                                "otp": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "temp_token": {
+                                                    "description": "Token temporaire pour la vérification OTP",
+                                                    "type": "string",
+                                                    "example": "R7Nbr5mna7bN9CSgK91eTKqOlNj8iju1"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Client non trouvé"
+                    },
+                    "400": {
+                        "description": "Compte non activé"
+                    }
+                }
+            }
+        },
+        "/api/v1/compte/verify-otp": {
+            "post": {
+                "tags": [
+                    "Authentification Client"
+                ],
+                "summary": "Vérification du code OTP pour connexion client",
+                "description": "Verify OTP for activation or login",
+                "operationId": "be7305abffaf315ed76da275abf4c668",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "telephone",
+                                    "otp"
+                                ],
+                                "properties": {
+                                    "telephone": {
+                                        "description": "Numéro de téléphone du client",
+                                        "type": "string",
+                                        "example": "+221781157773"
+                                    },
+                                    "otp": {
+                                        "description": "Code OTP à 6 chiffres",
+                                        "type": "string",
+                                        "example": "923823"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie, tokens OAuth2 générés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Connexion réussie"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "access_token": {
+                                                    "description": "Token d'accès OAuth2",
+                                                    "type": "string"
+                                                },
+                                                "refresh_token": {
+                                                    "description": "Token de rafraîchissement",
+                                                    "type": "string"
+                                                },
+                                                "token_type": {
+                                                    "type": "string",
+                                                    "example": "Bearer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Code OTP invalide/expiré ou numéro de téléphone non trouvé"
+                    }
+                }
+            }
+        },
+        "/api/v1/compte/logout": {
+            "post": {
+                "tags": [
+                    "Authentification Client"
+                ],
+                "summary": "Déconnexion du client",
+                "description": "Logout client",
+                "operationId": "8292c16c827fbc97e886b2817c6c51e0",
+                "responses": {
+                    "200": {
+                        "description": "Déconnexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Déconnexion réussie"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
                     }
                 },
                 "security": [

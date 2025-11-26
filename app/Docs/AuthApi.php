@@ -93,8 +93,7 @@ use OpenApi\Annotations as OA;
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(
- *             required={"telephone", "otp"},
- *             @OA\Property(property="telephone", type="string", example="+221781157773", description="Numéro de téléphone du client"),
+ *             required={"otp"},
  *             @OA\Property(property="otp", type="string", example="482913", description="Code OTP à 6 chiffres")
  *         )
  *     ),
