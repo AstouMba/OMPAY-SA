@@ -1992,17 +1992,17 @@
             },
             "ClientQrResponse": {
                 "title": "Réponse QR Code Client",
-                "description": "Réponse contenant le numéro de compte et le QR Code en Base64",
+                "description": "Réponse contenant le numéro de compte et le QR Code en SVG",
                 "properties": {
                     "numero_compte": {
                         "description": "Numéro du compte client",
                         "type": "string",
                         "example": "771234567"
                     },
-                    "qr_code_base64": {
-                        "description": "QR Code encodé en Base64 avec préfixe data URI",
+                    "qr_code_svg": {
+                        "description": "QR Code au format SVG",
                         "type": "string",
-                        "example": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4w..."
+                        "example": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'>..."
                     }
                 },
                 "type": "object"

@@ -122,7 +122,7 @@ class TransactionService
         }
 
         // Check balance
-        $soldeAvant = $compte->solde();
+        $soldeAvant = $compte->solde;
         if ($soldeAvant < $data['montant']) {
             throw new \Exception('Solde insuffisant');
         }
@@ -196,7 +196,7 @@ class TransactionService
         $totalDebit = $data['montant'] + $fees;
 
         // Check sender balance
-        $senderBalance = $senderAccount->solde();
+        $senderBalance = $senderAccount->solde;
         if ($senderBalance < $totalDebit) {
             throw new \Exception('Solde insuffisant');
         }
