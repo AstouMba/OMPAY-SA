@@ -91,12 +91,12 @@ class ClientController extends Controller
             ],
             'compte' => [
                 'numero_compte' => $compte->numero_compte,
-                'solde' => (float) $compte->getAttribute('solde'), // Utiliser la valeur de la colonne directement
+                'solde' => (float) $compte->solde, // Utiliser l'accessor du modèle qui calcule le solde
                 'statut' => $compte->statut,
             ],
             'transactions' => $transactionsData->values()->toArray(), // Convertir en array simple
             'qrcode' => [
-                'svg' => $qrCodeData['qr_code_svg'],
+                'base64' => $qrCodeData['qr_code_base64'],
                 'data' => $qrCodeData['qr_data']
             ],
         ];

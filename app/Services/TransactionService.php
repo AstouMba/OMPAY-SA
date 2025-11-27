@@ -128,14 +128,20 @@ class TransactionService
         }
 
         // Create transaction (no fees for merchant payments)
-        $transaction = \App\Models\Transaction::create([
+        $transactionData = [
             'compte_id' => $compte->id,
-            'marchand_id' => $marchand->id,
             'telephone_marchand' => $marchand->telephone,
             'type' => 'paiement_marchand',
             'montant' => $data['montant'],
             'statut' => 'validee', // Immediate debit
-        ]);
+        ];
+
+        // Only set marchand_id if it's a real marchand from the database
+        if ($typeIdentifiant !== 'numero_client_ompay') {
+            $transactionData['marchand_id'] = $marchand->id;
+        }
+
+        $transaction = \App\Models\Transaction::create($transactionData);
 
         // Calculate solde_apres
         $soldeApres = $soldeAvant - $data['montant'];
