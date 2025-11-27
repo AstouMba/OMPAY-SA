@@ -99,6 +99,21 @@ php artisan db:seed --class=MarchandSeeder
 php artisan db:seed --class=TransactionSeeder
 ```
 
+## Format de Réponse /compte/me
+
+L'endpoint `/compte/me` retourne maintenant :
+```json
+{
+  "client": { "nom": "...", "telephone": "..." },
+  "compte": { "numero_compte": "...", "solde": 213000.00, "statut": "actif" },
+  "transactions": [ /* liste formatée avec + et - */ ],
+  "qrcode": {
+    "svg": "<svg>...</svg>", // QR Code en format SVG
+    "data": "{"numero_compte":"...","client_name":"...","type":"ompay_account"}"
+  }
+}
+```
+
 ## Données de Test
 
 Chaque client a des transactions de démonstration :
@@ -108,3 +123,6 @@ Chaque client a des transactions de démonstration :
 - Transferts entre clients
 
 Ces transactions permettent de tester le calcul automatique du solde et l'affichage dans l'application Flutter.
+
+## ✅ Correction QR Code
+L'erreur "Undefined array key 'qr_code_base64'" a été corrigée. Le service retourne maintenant correctement `qr_code_svg` (format SVG) au lieu de `qr_code_base64`.
