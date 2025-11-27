@@ -76,28 +76,29 @@ class ClientController extends Controller
                 'montant' => $transactionArray['montant'], // Déjà formaté avec + et - par TransactionResource
                 'date_transaction' => $transaction->created_at->toISOString(),
             ];
-        });
+        })->values(); // S'assurer que c'est une collection indexée
 
         // Generate QR code
         $qrCodeData = $this->qrCodeService->generateClientQrCode($client);
-        $qrCode = $qrCodeData['qr_code_base64'];
 
         $data = [
             'client' => [
                 'id' => $client->id,
-                'nom' => $client->nom,
-                'prenom' => $client->prenom,
+                'nom' => $client->prenom, // Utiliser seulement le prénom pour l'affichage
+                'nom_complet' => $client->nom . ' ' . $client->prenom,
                 'telephone' => $client->telephone,
                 'nci' => $client->nci,
-                'statut' => $client->statut,
             ],
             'compte' => [
                 'numero_compte' => $compte->numero_compte,
-                'solde' => $compte->solde,
+                'solde' => (float) $compte->getAttribute('solde'), // Utiliser la valeur de la colonne directement
                 'statut' => $compte->statut,
             ],
-            'transactions' => $transactionsData,
-            'qrcode' => $qrCode,
+            'transactions' => $transactionsData->values()->toArray(), // Convertir en array simple
+            'qrcode' => [
+                'base64' => $qrCodeData['qr_code_base64'],
+                'data' => $qrCodeData['qr_data']
+            ],
         ];
 
         return $this->successResponse($data, 'Profil client récupéré avec succès');

@@ -17,20 +17,24 @@ class QrCodeService
 
         $payload = [
             'numero_compte' => $compte->numero_compte,
-            'nom_prenom'    => $client->nom . ' ' . $client->prenom,
+            'client_name' => $client->prenom, // Utiliser seulement le prénom
+            'type' => 'ompay_account'
         ];
 
-        // Génération QR Code en SVG (pas d'extension requise)
-        $svg = QrCode::format('svg')
+        // Génération QR Code en format PNG base64 pour réduire la taille
+        $qrData = QrCode::format('png')
             ->size(300)
             ->margin(2)
             ->encoding('UTF-8')
             ->generate(json_encode($payload));
 
-        // Convertir SVG en base64 pour Flutter
+        // Convertir en base64 pour envoyer à Flutter
+        $qrBase64 = base64_encode($qrData);
+
         return [
             'numero_compte'  => $compte->numero_compte,
-            'qr_code_base64' => 'data:image/svg+xml;base64,' . base64_encode($svg),
+            'qr_code_base64' => $qrBase64, // Base64 PNG pour Flutter
+            'qr_data' => json_encode($payload) // Données brutes au cas où Flutter veut générer son propre QR
         ];
     }
 }

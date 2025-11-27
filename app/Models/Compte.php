@@ -21,6 +21,7 @@ class Compte extends Model
         'type_compte',
         'devise',
         'statut',
+        'solde',
         'est_supprime'
     ];
 
@@ -44,7 +45,7 @@ class Compte extends Model
         return $query->where('client_id', $clientId);
     }
 
-    public function solde()
+    public function getCalculatedSolde()
     {
         // Calcul des entrées (crédits)
         $entrees = $this->transactions()
@@ -63,6 +64,7 @@ class Compte extends Model
 
     public function getSoldeAttribute()
     {
-        return $this->solde();
+        // Utiliser la valeur de la colonne solde si elle existe, sinon calculer
+        return $this->attributes['solde'] ?? $this->getCalculatedSolde();
     }
 }
