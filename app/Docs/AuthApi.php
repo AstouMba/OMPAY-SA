@@ -154,7 +154,7 @@ use OpenApi\Annotations as OA;
  *                         @OA\Property(property="date_transaction", type="string", format="date-time", example="2025-11-12T10:35:42Z")
  *                     )
  *                 ),
- *                 @OA\Property(property="qrcode", type="string", example="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...")
+ *                 @OA\Property(property="qrcode", type="string", example="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4w...")
  *             )
  *         )
  *     ),
