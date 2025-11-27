@@ -16,7 +16,7 @@ class ClientQrResource extends JsonResource
     {
         return [
             'numero_compte' => $this->resource['numero_compte'],
-            'qr_code_base64' => $this->resource['qr_code_base64'],
+            'qr_code_svg' => $this->resource['qr_code_svg'],
         ];
     }
 }
