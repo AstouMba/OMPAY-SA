@@ -15,7 +15,7 @@ class CompteResource extends JsonResource
             'client' => ClientResource::make($this->whenLoaded('client')),
             'type_compte' => $this->type_compte,
             'devise' => $this->devise,
-            'solde' => $this->solde(),
+            'solde' => $this->solde,
             'est_supprime' => $this->est_supprime,
             'date_creation' => $this->created_at,
             'transactions' => TransactionResource::collection($this->whenLoaded('transactions')),

@@ -23,7 +23,7 @@ class CompteService
             throw new \Exception('Aucun compte trouvé pour ce client.');
         }
 
-        $solde = $compte->solde();
+        $solde = $compte->solde;
         $devise = $compte->devise ?? 'FCFA';
         $dateMiseAJour = now()->toISOString();
 
@@ -47,7 +47,7 @@ class CompteService
 
     protected function getSoldeForCompteInstance(Compte $compte)
     {
-        $solde = $compte->solde();
+        $solde = $compte->solde;
         $devise = $compte->devise ?? 'FCFA';
         $dateMiseAJour = now()->toISOString();
 
@@ -67,7 +67,7 @@ class CompteService
     public function debitAccount(Compte $compte, $amount)
     {
         // Check balance
-        $currentSolde = $compte->solde();
+        $currentSolde = $compte->solde;
         if ($currentSolde < $amount) {
             throw new \Exception('Solde insuffisant');
         }
