@@ -96,7 +96,7 @@ class ClientController extends Controller
             ],
             'transactions' => $transactionsData->values()->toArray(), // Convertir en array simple
             'qrcode' => [
-                'base64' => $qrCodeData['qr_code_base64'],
+                'svg' => $qrCodeData['qr_code_svg'],
                 'data' => $qrCodeData['qr_data']
             ],
         ];

@@ -167,9 +167,9 @@ use OpenApi\Annotations as OA;
  *     schema="ClientQrResponse",
  *     type="object",
  *     title="Réponse QR Code Client",
- *     description="Réponse contenant le numéro de compte et le QR Code en Base64",
+ *     description="Réponse contenant le numéro de compte et le QR Code en SVG",
  *     @OA\Property(property="numero_compte", type="string", example="771234567", description="Numéro du compte client"),
- *     @OA\Property(property="qr_code_base64", type="string", example="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4w...", description="QR Code encodé en Base64 avec préfixe data URI")
+ *     @OA\Property(property="qr_code_svg", type="string", example="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'>...", description="QR Code au format SVG")
  * )
  */
 class Schemas {}
